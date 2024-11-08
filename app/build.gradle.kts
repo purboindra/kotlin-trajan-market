@@ -71,6 +71,10 @@ dependencies {
     implementation(libs.ktor.cio)
     implementation(libs.ktor.core)
 
+    // COIL
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
 }
 
 kapt {
