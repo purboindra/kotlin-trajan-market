@@ -60,8 +60,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // HILT
-    implementation(libs.dagger.hilt.android) // Hilt runtime dependency
-    kapt(libs.dagger.hilt.compiler)          // Hilt compiler dependency
+    implementation(libs.dagger.hilt.android)
+    kapt(libs.dagger.hilt.compiler)
+
+    // NAVIGATION
+    implementation(libs.navigation.compose)
+    implementation(libs.navigation.ui)
 
 }
 
