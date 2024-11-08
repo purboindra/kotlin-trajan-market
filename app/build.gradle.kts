@@ -70,6 +70,11 @@ dependencies {
     // KTOR
     implementation(libs.ktor.cio)
     implementation(libs.ktor.core)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.content.negotiation)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.serialization)
 
     // COIL
     implementation(libs.coil.compose)
