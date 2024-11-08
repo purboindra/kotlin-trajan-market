@@ -67,6 +67,10 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.navigation.ui)
 
+    // KTOR
+    implementation(libs.ktor.cio)
+    implementation(libs.ktor.core)
+
 }
 
 kapt {
