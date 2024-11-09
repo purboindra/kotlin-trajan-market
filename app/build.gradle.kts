@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     id("org.jetbrains.kotlin.kapt")
+    
+    kotlin("plugin.serialization") version "2.0.20"
 }
 
 android {
@@ -73,8 +75,7 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.serialization)
     implementation(libs.ktor.content.negotiation)
-    implementation(libs.ktor.serialization)
-    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     // COIL
     implementation(libs.coil.compose)
