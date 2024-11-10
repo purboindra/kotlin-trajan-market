@@ -1,7 +1,7 @@
 [versions]
 agp = "8.7.0"
 kotlin = "2.0.0"
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -9,6 +9,8 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 hilt = "2.51.1"
+hilt2="2.52"
+hilt-navitation="1.2.0"
 navigation-compose="2.8.3"
 ktor="3.0.0"
 coil="3.0.1"
@@ -16,7 +18,6 @@ serialization="1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -30,9 +31,9 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
-navigation-compose={module="androidx.navigation:navigation-compose",version.ref="navigation-compose"}
+#dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+#dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 navigation-fragment={module="androidx.navigation:navigation-fragment",version.ref="navigation-compose"}
 navigation-ui={module="androidx.navigation:navigation-ui",version.ref="navigation-compose"}
 ktor-core ={module="io.ktor:ktor-client-core",version.ref="ktor"}
@@ -46,6 +47,12 @@ coil-compose={module="io.coil-kt.coil3:coil-compose",version.ref="coil"}
 coil-network-okhttp={module="io.coil-kt.coil3:coil-network-okhttp",version.ref="coil"}
 
 serialization-json={module="org.jetbrains.kotlinx:kotlinx-serialization-json",version.ref="serialization"}
+
+#HILT 2
+hilt-android = {module="com.google.dagger:hilt-android",version.ref="hilt2"}
+hilt-compiler ={module="com.google.dagger:hilt-compiler",version.ref="hilt2"}
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

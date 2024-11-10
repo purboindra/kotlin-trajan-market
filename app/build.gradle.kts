@@ -4,13 +4,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     id("org.jetbrains.kotlin.kapt")
-    
+    id("kotlin-kapt")
     kotlin("plugin.serialization") version "2.0.20"
 }
 
 android {
     namespace = "com.example.trajanmarket"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.trajanmarket"
@@ -62,8 +62,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // HILT
-    implementation(libs.dagger.hilt.android)
-    kapt(libs.dagger.hilt.compiler)
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+//    implementation(libs.hilt.n)
 
     // NAVIGATION
     implementation(libs.navigation.compose)
@@ -81,6 +83,10 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
+}
+
+hilt {
+    enableAggregatingTask = true
 }
 
 kapt {

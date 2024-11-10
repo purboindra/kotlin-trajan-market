@@ -1,9 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-//buildscript {
-//    dependencies {
-//        classpath(libs.hilt.android.gradle.plugin) // Adjust version if needed
+buildscript {
+//    repositories {
+//        mavenCentral()
 //    }
-//}
+    dependencies {
+//        implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    }
+}
+
+
 
 
 plugins {
