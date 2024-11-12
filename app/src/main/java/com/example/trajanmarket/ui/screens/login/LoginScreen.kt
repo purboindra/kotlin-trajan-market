@@ -40,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -69,9 +70,13 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
     val userName by loginViewModel.userName.collectAsState()
     val password by loginViewModel.password.collectAsState()
     val hasShowPassword by loginViewModel.showPassword.collectAsState()
+    val userNameError by loginViewModel.userNameError.collectAsState()
+    val passwordError by loginViewModel.passwordError.collectAsState()
     
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    
+    val keyboardController = LocalSoftwareKeyboardController.current
     
     LaunchedEffect(loginState) {
         if (loginState is State.Failure) {
@@ -112,7 +117,19 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                         .fillMaxWidth()
                         .height(48.dp),
                     onClick = {
-                        loginViewModel.login(userName, password)
+                        
+                        if (userName.isBlank()) {
+                            loginViewModel.onUserNameErrorChange("Username cannot be empty!")
+                        }
+                        
+                        if (password.isBlank()) {
+                            loginViewModel.onPasswordErrorChange("Password cannot be empty!")
+                        }
+                        
+                        if (passwordError == null || userNameError == null) {
+                            keyboardController?.hide()
+                            loginViewModel.login(userName, password)
+                        }
                     },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonColors(
@@ -191,6 +208,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                     onValueChange = {
                         loginViewModel.onUserNameChange(it)
                     },
+                    isError = userNameError!=null,
                     label = {
                         Text(text = "Username", color = Color.Gray)
                     },
@@ -204,16 +222,27 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                         )
                     }
                 )
+                if (userNameError != null)
+                    Text(
+                        text = userNameError ?: "",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
                 10.VerticalSpacer()
                 OutlinedTextField(
-                    modifier = Modifier.fillParentMaxWidth().padding(horizontal = 0.dp),
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .padding(horizontal = 0.dp),
                     value = password,
                     onValueChange = {
                         loginViewModel.onPasswordChange(it)
                     },
+                    isError = passwordError!=null,
                     label = {
                         Text(text = "Password", color = Color.Gray)
                     },
+                    
                     visualTransformation = if (hasShowPassword) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     shape = RoundedCornerShape(12.dp),
@@ -241,6 +270,13 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                         }
                     }
                 )
+                if (passwordError != null)
+                    Text(
+                        text = passwordError ?: "",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
             }
         }
     }
