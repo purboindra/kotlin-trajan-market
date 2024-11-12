@@ -1,6 +1,7 @@
 package com.example.trajanmarket.ui.screens.login
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -204,7 +206,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                 )
                 10.VerticalSpacer()
                 OutlinedTextField(
-                    modifier = Modifier.fillParentMaxWidth(),
+                    modifier = Modifier.fillParentMaxWidth().padding(horizontal = 0.dp),
                     value = password,
                     onValueChange = {
                         loginViewModel.onPasswordChange(it)
@@ -218,15 +220,19 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                     textStyle = TextStyle(fontSize = 18.sp),
                     prefix = {
                         Icon(
-                            Icons.Rounded.Person,
+                            Icons.Default.Lock,
                             contentDescription = "Username",
                             tint = Color.Gray
                         )
                     },
                     suffix = {
-                        IconButton(onClick = {
-                            loginViewModel.toggleShowPassword()
-                        }) {
+                        Box(
+                            Modifier
+                                .padding(end = 0.dp)
+                                .clickable {
+                                    loginViewModel.toggleShowPassword()
+                                }
+                        ) {
                             Icon(
                                 painterResource(id = if (hasShowPassword) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24),
                                 contentDescription = "password",
