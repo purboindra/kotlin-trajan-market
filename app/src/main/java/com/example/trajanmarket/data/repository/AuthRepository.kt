@@ -1,6 +1,7 @@
 package com.example.trajanmarket.data.repository
 
 import android.util.Log
+import com.example.trajanmarket.data.model.LoginResponse
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AuthApi
 import com.example.trajanmarket.data.remote.service.ParsedClientException
@@ -17,9 +18,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 
-@Serializable
-@SerialName("accessToken")
-data class LoginResponse(val token: String)
 
 @Serializable
 data class ErrorResponse(val message: String)
@@ -32,8 +30,8 @@ class AuthRepository(private val authApi: AuthApi) {
             val response = authApi.login(username, password)
             Log.d("Response AuthRepository","Login: ${response.status}")
             if (response.status.isSuccess()) {
-                val loginResponse: LoginResponse =
-                    Json.decodeFromString<LoginResponse>(response.body())
+                val responseBody = response.bodyAsText()
+                val loginResponse: LoginResponse = Json.decodeFromString<LoginResponse>(responseBody)
                 Log.d("isSuccess AuthRepository", response.bodyAsText())
                 Log.d("isSuccess AuthRepository", response.body())
                 emit(State.Succes(loginResponse))

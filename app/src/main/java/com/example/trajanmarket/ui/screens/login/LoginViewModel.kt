@@ -2,9 +2,9 @@ package com.example.trajanmarket.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trajanmarket.data.model.LoginResponse
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.repository.AuthRepository
-import com.example.trajanmarket.data.repository.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.MutableStateFlow

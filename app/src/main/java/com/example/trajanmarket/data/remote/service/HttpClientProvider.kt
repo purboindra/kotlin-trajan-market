@@ -36,7 +36,6 @@ object HttpClientProvider {
             expectSuccess = true
             HttpResponseValidator {
                 validateResponse { response ->
-                    // If you need additional checks, you can add them here
                     Log.d("validateResponse HttpResponseValidator", response.body())
                     val error: Error = response.body()
                     if (error.code != 0) {

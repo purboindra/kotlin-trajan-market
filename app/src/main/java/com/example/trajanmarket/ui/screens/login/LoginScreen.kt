@@ -126,6 +126,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                             loginViewModel.onPasswordErrorChange("Password cannot be empty!")
                         }
                         
+                        
+                        
                         if (passwordError == null || userNameError == null) {
                             keyboardController?.hide()
                             loginViewModel.login(userName, password)
