@@ -23,6 +23,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 
 class ParsedClientException(
@@ -36,36 +37,45 @@ object HttpClientProvider {
             expectSuccess = true
             HttpResponseValidator {
                 validateResponse { response ->
-                    Log.d("validateResponse HttpResponseValidator", response.body())
-                    val error: Error = response.body()
-                    if (error.code != 0) {
-                        Log.e("ValidateResponse", "Erro Code != 0: ${error.message}")
+                    if (!response.status.isSuccess()) {
+                        val errorText = response.bodyAsText()
+                        Log.d("validateResponse HttpResponseValidator", "Error Text: $errorText")
+                        
+                        val errorResponse = try {
+                            Json.decodeFromString<ErrorResponse>(errorText)
+                        } catch (e: Exception) {
+                            ErrorResponse("An unknown error occurred")
+                        }
+                        
+                        Log.e("ValidateResponse", "Error Code: ${response.status}, Message: ${errorResponse.message}")
                         throw CustomResponseException(
                             response,
-                            "Code: ${error.code}, message: ${error.message}"
+                            "Code: ${response.status}, message: ${errorResponse.message}"
                         )
                     }
                 }
+                
                 handleResponseExceptionWithRequest { exception, _ ->
                     val clientException = exception as? ClientRequestException
                         ?: return@handleResponseExceptionWithRequest
                     val exceptionResponse = clientException.response
                     val exceptionResponseText = exceptionResponse.bodyAsText()
-
+                    
                     val errorResponse = try {
                         Json.decodeFromString<ErrorResponse>(exceptionResponseText)
                     } catch (e: Exception) {
                         ErrorResponse("An unknown error occurred")
                     }
-
+                    
                     Log.e("Exception HttpClientProvider", errorResponse.message)
-
+                    
                     throw ParsedClientException(
                         exceptionResponse,
                         errorResponse.message
                     )
                 }
             }
+            
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true

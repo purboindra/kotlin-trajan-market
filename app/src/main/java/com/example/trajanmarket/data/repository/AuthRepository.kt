@@ -18,33 +18,28 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 
-
 @Serializable
 data class ErrorResponse(val message: String)
 
 class AuthRepository(private val authApi: AuthApi) {
-
+    
     fun login(username: String, password: String): Flow<State<LoginResponse>> = flow {
         emit(State.Loading)
         try {
             val response = authApi.login(username, password)
-            Log.d("Response AuthRepository","Login: ${response.status}")
+            Log.d("Response AuthRepository", "Login: ${response.status}")
             if (response.status.isSuccess()) {
                 val responseBody = response.bodyAsText()
-                val loginResponse: LoginResponse = Json.decodeFromString<LoginResponse>(responseBody)
-                Log.d("isSuccess AuthRepository", response.bodyAsText())
-                Log.d("isSuccess AuthRepository", response.body())
+                val loginResponse: LoginResponse =
+                    Json.decodeFromString<LoginResponse>(responseBody)
                 emit(State.Succes(loginResponse))
             } else {
                 val errorText = response.bodyAsText()
                 val errorResponse = try {
                     Json.decodeFromString<ErrorResponse>(errorText)
                 } catch (e: Exception) {
-                    ErrorResponse("An unknown error occurred")
+                    ErrorResponse(e.message ?: "Unknown error occurred")
                 }
-
-                Log.e("!isSuccess AuthRepository", "Login: ${errorResponse.message}")
-
                 emit(State.Failure(Exception(errorResponse.message)))
             }
         } catch (e: ParsedClientException) {

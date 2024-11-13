@@ -49,13 +49,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
+import com.example.trajanmarket.ui.navigation.Main
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.ui.theme.yellow80
@@ -63,7 +64,10 @@ import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen(
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    navHostController: NavHostController
+) {
     
     val loginState by loginViewModel.loginState.collectAsState()
     
@@ -84,6 +88,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
             scope.launch {
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occured")
             }
+        } else if (loginState is State.Succes) {
+            navHostController.navigate(route = Main)
         }
     }
     
@@ -117,7 +123,6 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                         .fillMaxWidth()
                         .height(48.dp),
                     onClick = {
-                        
                         if (userName.isBlank()) {
                             loginViewModel.onUserNameErrorChange("Username cannot be empty!")
                         }
@@ -126,9 +131,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                             loginViewModel.onPasswordErrorChange("Password cannot be empty!")
                         }
                         
-                        
-                        
-                        if (passwordError == null || userNameError == null) {
+                        if (passwordError == null && userNameError == null) {
                             keyboardController?.hide()
                             loginViewModel.login(userName, password)
                         }
@@ -210,7 +213,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                     onValueChange = {
                         loginViewModel.onUserNameChange(it)
                     },
-                    isError = userNameError!=null,
+                    isError = userNameError != null,
                     label = {
                         Text(text = "Username", color = Color.Gray)
                     },
@@ -240,7 +243,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
                     onValueChange = {
                         loginViewModel.onPasswordChange(it)
                     },
-                    isError = passwordError!=null,
+                    isError = passwordError != null,
                     label = {
                         Text(text = "Password", color = Color.Gray)
                     },

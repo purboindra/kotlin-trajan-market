@@ -1,5 +1,6 @@
 package com.example.trajanmarket.ui.screens.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trajanmarket.data.model.LoginResponse
@@ -41,11 +42,11 @@ class LoginViewModel @Inject constructor(
         _showPassword.update { !it }
     }
     
-    fun onUserNameErrorChange(text:String){
+    fun onUserNameErrorChange(text: String?) {
         _userNameError.update { text }
     }
     
-    fun onPasswordErrorChange(text:String){
+    fun onPasswordErrorChange(text: String?) {
         _passwordError.update { text }
     }
     
@@ -65,6 +66,5 @@ class LoginViewModel @Inject constructor(
                 _loginState.value = state
             }
         }
-        
     }
 }
