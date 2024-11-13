@@ -19,9 +19,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val loginViewModelL: LoginViewModel by viewModels()
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
