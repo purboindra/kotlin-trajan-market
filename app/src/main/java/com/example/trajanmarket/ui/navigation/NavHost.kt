@@ -9,10 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
 import com.example.trajanmarket.ui.screens.login.LoginScreen
-import kotlinx.serialization.Serializable
-
-@Serializable
-object Login
+import com.example.trajanmarket.ui.screens.main.MainScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -21,11 +18,13 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             startDestination = Login
         ) {
             composable<Login> {
-                LoginScreen()
+                LoginScreen(navHostController = navController)
+            }
+            composable<Main> {
+                MainScreen()
             }
         }
     }
-    
     NavHost(
         navController = navController,
         graph = navGraph
