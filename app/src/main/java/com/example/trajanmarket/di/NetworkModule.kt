@@ -34,7 +34,7 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideAuthRepositoru(authApi: AuthApi): AuthRepository = AuthRepository(authApi)
+    fun provideAuthRepository(authApi: AuthApi): AuthRepository = AuthRepository(authApi)
     
     
 }
