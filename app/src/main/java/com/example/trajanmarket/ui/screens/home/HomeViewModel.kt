@@ -1,6 +1,5 @@
-package com.example.trajanmarket.ui.screens.product
+package com.example.trajanmarket.ui.screens.home
 
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trajanmarket.data.model.Product
@@ -14,17 +13,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductViewModel @Inject constructor(
-    private val getProductUseCase: GetProductUseCase
+class HomeViewModel @Inject constructor(
+    private val productUseCase: GetProductUseCase
 ) : ViewModel() {
-    private val _productState = MutableStateFlow<State<Product>>(State.Idle)
-    var productState: StateFlow<State<Product>> = _productState
     
-    private fun fetchAllProducts() {
-        viewModelScope.launch {
-            getProductUseCase().collectLatest { state ->
-                _productState.value = state
-            }
+    private val _products = MutableStateFlow<State<Product>>(State.Idle)
+    val products: StateFlow<State<Product>> = _products
+    
+    fun fetchAllProducts() = viewModelScope.launch {
+        val product = productUseCase.invoke()
+        product.collectLatest { state ->
+            _products.emit(state)
         }
     }
+    
 }
