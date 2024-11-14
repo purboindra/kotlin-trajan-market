@@ -11,13 +11,14 @@ composeBom = "2024.04.01"
 hilt = "2.51.1"
 hilt2 = "2.52"
 hilt-navitation = "1.2.0"
-navigation-compose = "2.8.3"
+navigation-compose = "2.8.4"
 ktor = "3.0.0"
 coil = "3.0.1"
 serialization = "1.7.3"
 room-version = "2.6.1"
 ksp = "1.8.10-1.0.9"
 data-store = "1.1.1"
+material = "1.7.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +28,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version="1.7.5" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -34,6 +36,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+#MATERIAL
+material = { module = "androidx.compose.material:material", version.ref = "material" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation-compose" }
 navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigation-compose" }
