@@ -1,6 +1,5 @@
 package com.example.trajanmarket.ui.navigation
 
-import android.provider.ContactsContract
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
@@ -10,13 +9,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
 import com.example.trajanmarket.ui.screens.login.LoginScreen
 import com.example.trajanmarket.ui.screens.main.MainScreen
+import com.example.trajanmarket.ui.screens.splash.SplashScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
     val navGraph = remember(navController) {
         navController.createGraph(
-            startDestination = Login
+            startDestination = Splash
         ) {
+            composable<Splash> {
+                SplashScreen(navHostController = navController)
+            }
             composable<Login> {
                 LoginScreen(navHostController = navController)
             }
