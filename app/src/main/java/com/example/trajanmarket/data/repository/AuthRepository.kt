@@ -1,6 +1,7 @@
 package com.example.trajanmarket.data.repository
 
 import android.util.Log
+import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.model.LoginResponse
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AuthApi
@@ -13,7 +14,6 @@ import io.ktor.client.statement.request
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -21,17 +21,23 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class ErrorResponse(val message: String)
 
-class AuthRepository(private val authApi: AuthApi) {
+class AuthRepository(
+    private val userPreferences: UserPreferences,
+    private val authApi: AuthApi
+) {
     
     fun login(username: String, password: String): Flow<State<LoginResponse>> = flow {
         emit(State.Loading)
         try {
             val response = authApi.login(username, password)
-            Log.d("Response AuthRepository", "Login: ${response.status}")
             if (response.status.isSuccess()) {
                 val responseBody = response.bodyAsText()
                 val loginResponse: LoginResponse =
                     Json.decodeFromString<LoginResponse>(responseBody)
+                
+                userPreferences.saveUserName(loginResponse.username)
+                userPreferences.saveIsLoggeddIn(true)
+                
                 emit(State.Succes(loginResponse))
             } else {
                 val errorText = response.bodyAsText()

@@ -2,10 +2,12 @@ package com.example.trajanmarket.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.model.LoginResponse
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.domain.usecases.AuthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -15,8 +17,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    userPreferences: UserPreferences,
     private val authUseCase: AuthUseCase
 ) : ViewModel() {
+    
+    val userNamePref:Flow<String?> = userPreferences.userName
     
     private val _loginState = MutableStateFlow<State<LoginResponse>>(State.Idle)
     val loginState: StateFlow<State<LoginResponse>> = _loginState

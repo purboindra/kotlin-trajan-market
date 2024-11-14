@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -24,7 +23,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -40,7 +38,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -53,8 +50,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.trajanmarket.R
@@ -65,15 +60,16 @@ import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.ui.theme.yellow80
 import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
-import java.util.prefs.Preferences
 
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
-
+    
     val loginState by loginViewModel.loginState.collectAsState()
+    
+    val userNamePref by loginViewModel.userNamePref.collectAsState(initial = null)
     
     val userName by loginViewModel.userName.collectAsState()
     val password by loginViewModel.password.collectAsState()
@@ -202,7 +198,7 @@ fun LoginScreen(
                 .padding(paddingValues)
         ) {
             item {
-                Text("Hello Purboyndra", fontSize = 20.sp, fontWeight = FontWeight.W700)
+                Text("Hello ${userNamePref ?: ""}", fontSize = 20.sp, fontWeight = FontWeight.W700)
                 18.VerticalSpacer()
                 Text("Let’s Sign You In", fontSize = 20.sp, fontWeight = FontWeight.W700)
                 Text(

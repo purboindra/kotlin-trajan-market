@@ -13,27 +13,31 @@ class UserPreferences(private val context: Context) {
             preferences[PreferencesKey.USER_NAME] = userName
         }
     }
-
+    
     suspend fun saveAccesToken(accessToken: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.ACCESS_TOKEN] = accessToken
         }
     }
-
+    
     suspend fun saveUserImage(image: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.USER_IMAGE] = image
         }
     }
-
+    
     suspend fun saveIsLoggeddIn(isLoggedIn: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.IS_LOGGED_IN] = isLoggedIn
         }
     }
-
+    
     val userName: Flow<String?> = context.dataStore.data.map { preferences ->
         preferences[PreferencesKey.USER_NAME]
     }
-
+    
+    val isLoggedIn: Flow<Boolean?> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKey.IS_LOGGED_IN]
+    }
+    
 }

@@ -6,7 +6,9 @@ import com.example.trajanmarket.data.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class AuthUseCase @Inject constructor(private val authRepository: AuthRepository) {
+class AuthUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+) {
     fun login(username: String, password: String): Flow<State<LoginResponse>> =
         authRepository.login(username, password)
 }
