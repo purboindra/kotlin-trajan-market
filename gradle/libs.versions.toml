@@ -17,6 +17,7 @@ coil = "3.0.1"
 serialization = "1.7.3"
 room-version = "2.6.1"
 ksp = "1.8.10-1.0.9"
+data-store = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -57,6 +58,10 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room-version" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room-version" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room-version" }
+
+#DATASTORE
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "data-store" }
+datastore = { module = "androidx.datastore:datastore", version.ref = "data-store" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

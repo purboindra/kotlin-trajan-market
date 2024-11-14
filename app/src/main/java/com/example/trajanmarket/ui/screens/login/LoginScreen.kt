@@ -40,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -52,6 +53,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.trajanmarket.R
@@ -62,13 +65,14 @@ import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.ui.theme.yellow80
 import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
+import java.util.prefs.Preferences
 
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
-    
+
     val loginState by loginViewModel.loginState.collectAsState()
     
     val userName by loginViewModel.userName.collectAsState()
