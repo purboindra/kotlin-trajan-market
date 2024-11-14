@@ -1,5 +1,6 @@
 package com.example.trajanmarket.di
 
+import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.remote.api.AuthApi
 import com.example.trajanmarket.data.remote.api.ProductApi
 import com.example.trajanmarket.data.remote.service.HttpClientProvider
@@ -34,7 +35,6 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideAuthRepository(authApi: AuthApi): AuthRepository = AuthRepository(authApi)
-    
-    
+    fun provideAuthRepository(authApi: AuthApi, userPreferences: UserPreferences): AuthRepository =
+        AuthRepository(userPreferences, authApi)
 }
