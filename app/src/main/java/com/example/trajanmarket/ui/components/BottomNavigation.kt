@@ -72,8 +72,8 @@ fun BottomNavigationBar(
                         color = if (selectedItem == index) Color(0xff5D3587) else Color.Gray,
                         text = when (item) {
                             0 -> "Home"
-                            1 -> "Cinemas"
-                            2 -> "Ticket"
+                            1 -> "Search"
+                            2 -> "Cart"
                             3 -> "Profile"
                             else -> "Unknown"
                         }

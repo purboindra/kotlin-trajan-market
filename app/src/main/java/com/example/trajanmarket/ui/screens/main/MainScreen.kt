@@ -29,8 +29,6 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
     
     val bottomNavbarIndex by mainViewModel.bottomNavbarIndex.collectAsState()
     
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     
     val bodies = listOf<@Composable () -> Unit>(
         {
@@ -65,41 +63,23 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
         }
     )
     
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                ModalDrawerSheet {
-                    Text("Drawer title", modifier = Modifier.padding(16.dp))
-                    HorizontalDivider()
-                    NavigationDrawerItem(
-                        label = { Text(text = "Drawer Item") },
-                        selected = false,
-                        onClick = { /*TODO*/ }
-                    )
-                    // ...other drawer items
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(
+                items = bodies.indices.toList(),
+                selectedItem = bottomNavbarIndex,
+                onItemSelected = { index ->
+                    mainViewModel.onChangeBottomNavbarIndex(index)
                 }
-            }
-        },
-    ) {
-        Scaffold(
-            bottomBar = {
-                BottomNavigationBar(
-                    items = bodies.indices.toList(),
-                    selectedItem = bottomNavbarIndex,
-                    onItemSelected = { index ->
-                        mainViewModel.onChangeBottomNavbarIndex(index)
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize(), contentAlignment = Alignment.Center
-            ) {
-                bodies[bottomNavbarIndex]()
-            }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(), contentAlignment = Alignment.Center
+        ) {
+            bodies[bottomNavbarIndex]()
         }
     }
 }
