@@ -1,5 +1,6 @@
 package com.example.trajanmarket.data.repository
 
+import android.util.Log
 import com.example.trajanmarket.data.model.Categories
 import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
@@ -18,12 +19,17 @@ class ProductRepository(private val api: ProductApi) {
         }
     }
     
-    suspend fun fetchProductsByCategory(category: String) = flow {
+    fun fetchProductsByCategory(category: String) = flow {
         emit(State.Loading)
         try {
             val product = api.fetchProductsByCategory(category)
             emit(State.Succes(product))
         } catch (e: Exception) {
+            Log.e("fetchProductsByCategory Repository", "An error occurred while fetching products by category", e)
+            
+            Log.e("fetchProductsByCategory Message", "Error Message: ${e.message}")
+            Log.e("fetchProductsByCategory Cause", "Cause: ${e.cause}")
+            Log.e("fetchProductsByCategory Stack Trace", Log.getStackTraceString(e))
             emit(State.Failure(e))
         }
     }

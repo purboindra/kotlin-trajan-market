@@ -20,7 +20,7 @@ data class Product(
         @SerialName("availabilityStatus")
         val availabilityStatus: String,
         @SerialName("brand")
-        val brand: String,
+        val brand: String? = null,
         @SerialName("category")
         val category: String,
         @SerialName("description")
@@ -71,7 +71,7 @@ data class Product(
             @SerialName("width")
             val width: Double
         )
-
+        
         @Serializable
         data class Meta(
             @SerialName("barcode")
@@ -83,7 +83,7 @@ data class Product(
             @SerialName("updatedAt")
             val updatedAt: String
         )
-
+        
         @Serializable
         data class Review(
             @SerialName("comment")

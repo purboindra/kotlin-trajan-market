@@ -76,8 +76,8 @@ fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
     ) { paddingValues ->
         Box(
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(), contentAlignment = Alignment.Center
+                .padding(paddingValues).padding(vertical = 12.dp)
+                .fillMaxSize()
         ) {
             bodies[bottomNavbarIndex]()
         }
