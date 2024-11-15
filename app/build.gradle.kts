@@ -101,6 +101,8 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.datastore)
     
+    implementation(libs.compose.shimmeer)
+    
 }
 
 hilt {
