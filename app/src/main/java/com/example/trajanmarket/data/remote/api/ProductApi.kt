@@ -11,6 +11,6 @@ class ProductApi(private val client: HttpClient) {
     suspend fun fetchProductsByCategory(category: String): Product =
         client.get("products/category/${category}").body()
     
-    suspend fun fetchCategoryProductList(): Categories =
+    suspend fun fetchCategoryProductList(): List<String> =
         client.get("products/category-list").body()
 }

@@ -34,7 +34,7 @@ class ProductRepository(private val api: ProductApi) {
         }
     }
     
-    suspend fun fetchCategoryProductList() = flow {
+    fun fetchCategoryProductList() = flow {
         emit(State.Loading)
         try {
             val categories = api.fetchCategoryProductList()

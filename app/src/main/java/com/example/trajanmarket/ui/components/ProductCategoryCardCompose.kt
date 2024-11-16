@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -46,15 +47,21 @@ fun ProductCategoryCardCompose( product: Product.Product){
                     contentDescription = product.title,
                     modifier = Modifier.height(100.dp),
                     contentScale = ContentScale.Fit,
+                    
                 )
                 
                 8.VerticalSpacer()
                 
                 Text(
                     product.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.W700
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.W700,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2,
+                    modifier = Modifier.padding(horizontal = 6.dp)
                 )
+                
+                8.VerticalSpacer()
                 
             }
         }
