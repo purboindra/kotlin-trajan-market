@@ -30,6 +30,7 @@ import coil3.request.crossfade
 import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.LoadingShimmer
+import com.example.trajanmarket.ui.components.ProductCategoryCardCompose
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.VerticalSpacer
 
@@ -67,42 +68,7 @@ fun CategoryCompose(homeViewModel: HomeViewModel = hiltViewModel()) {
                     val products = product.products
                     LazyRow(modifier = Modifier.padding(horizontal = 8.dp)) {
                         items(products) { product ->
-                            Surface(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp, vertical = 6.dp)
-                                    .fillParentMaxHeight(),
-                                color = grayLight,
-                                shape = RoundedCornerShape(18)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(166.dp)
-                                        .fillParentMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(product.thumbnail).crossfade(true)
-                                                .build(),
-                                            contentDescription = product.title,
-                                            modifier = Modifier.height(100.dp),
-                                            contentScale = ContentScale.Fit,
-                                        )
-                                        
-                                        8.VerticalSpacer()
-                                        
-                                        Text(
-                                            product.title,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.W700
-                                        )
-                                        
-                                    }
-                                }
-                            }
+                            ProductCategoryCardCompose(product)
                         }
                     }
                 }
