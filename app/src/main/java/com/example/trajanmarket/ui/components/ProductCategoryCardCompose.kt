@@ -47,7 +47,6 @@ fun ProductCategoryCardCompose( product: Product.Product){
                     contentDescription = product.title,
                     modifier = Modifier.height(100.dp),
                     contentScale = ContentScale.Fit,
-                    
                 )
                 
                 8.VerticalSpacer()

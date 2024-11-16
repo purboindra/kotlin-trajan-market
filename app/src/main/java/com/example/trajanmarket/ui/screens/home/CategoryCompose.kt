@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
+import com.example.trajanmarket.ui.components.LoadingCard
 import com.example.trajanmarket.ui.components.LoadingShimmer
 import com.example.trajanmarket.ui.components.ProductCategoryCardCompose
 import com.example.trajanmarket.utils.VerticalSpacer
@@ -47,10 +48,15 @@ fun CategoryCompose(homeViewModel: HomeViewModel) {
             when (productsState) {
                 is State.Loading -> {
                     Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.padding(horizontal = 12.dp)
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 8.dp).fillMaxWidth()
                     ) {
-                        LoadingShimmer(150.dp)
+                      LazyRow {
+                          items(6){
+                            Box(modifier = Modifier.padding(horizontal = 8.dp)){
+                                LoadingCard(150.dp, width = 130.dp)
+                            }
+                          }
+                      }
                     }
                 }
                 

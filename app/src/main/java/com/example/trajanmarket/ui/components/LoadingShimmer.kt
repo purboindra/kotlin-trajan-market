@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,4 +31,18 @@ fun LoadingShimmer(height: Dp? = null) {
                 .background(Color.LightGray),
         )
     }
+}
+
+@Composable
+fun LoadingCard(height: Dp?=null,width: Dp?=null){
+   Surface (
+       shape = RoundedCornerShape(18)
+   ) {
+       Box(
+           modifier = Modifier.shimmer()
+               .width(width?:64.dp)
+               .height(height ?: 24.dp)
+               .background(Color.LightGray),
+       )
+   }
 }
