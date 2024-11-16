@@ -35,7 +35,7 @@ import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.VerticalSpacer
 
 @Composable
-fun CategoryCompose(homeViewModel: HomeViewModel = hiltViewModel()) {
+fun CategoryCompose(homeViewModel: HomeViewModel) {
     
     val productsState by homeViewModel.productsByCategory.collectAsState()
     
@@ -51,6 +51,8 @@ fun CategoryCompose(homeViewModel: HomeViewModel = hiltViewModel()) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text("Browse by Category", fontSize = 18.sp, fontWeight = FontWeight.W700)
         }
+        10.VerticalSpacer()
+        
         10.VerticalSpacer()
         Box(modifier = Modifier.height(180.dp)) {
             when (productsState) {

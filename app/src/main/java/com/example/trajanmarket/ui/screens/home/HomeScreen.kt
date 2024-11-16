@@ -12,7 +12,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             item {
-                CategoryCompose()
+                CategoryCompose(homeViewModel)
             }
         }
     }
