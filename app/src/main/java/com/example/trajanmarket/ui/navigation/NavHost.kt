@@ -24,7 +24,10 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 LoginScreen(navHostController = navController)
             }
             composable<Main> {
-                MainScreen()
+                MainScreen(navHostController = navController)
+            }
+            composable<ProductDetail> { backStackEntry ->
+                ProductDetail(backStackEntry.id)
             }
         }
     }

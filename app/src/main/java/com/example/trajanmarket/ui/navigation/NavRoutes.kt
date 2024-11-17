@@ -10,3 +10,6 @@ object Main
 
 @Serializable
 object Splash
+
+@Serializable
+data class ProductDetail(val id: String)
