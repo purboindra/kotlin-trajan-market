@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,21 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.LoadingCard
-import com.example.trajanmarket.ui.components.LoadingShimmer
 import com.example.trajanmarket.ui.components.ProductCategoryCardCompose
 import com.example.trajanmarket.utils.VerticalSpacer
 
 @Composable
-fun CategoryCompose(homeViewModel: HomeViewModel) {
+fun CategoryCompose(homeViewModel: HomeViewModel, navHostController: NavHostController) {
     
     val productsState by homeViewModel.productsByCategory.collectAsState()
-    
-    LaunchedEffect(Unit) {
-        homeViewModel.fetchProductsByCategory("groceries")
-    }
     
     Column(
         modifier = Modifier
@@ -48,15 +43,17 @@ fun CategoryCompose(homeViewModel: HomeViewModel) {
             when (productsState) {
                 is State.Loading -> {
                     Box(
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 8.dp).fillMaxWidth()
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp, vertical = 8.dp)
+                            .fillMaxWidth()
                     ) {
-                      LazyRow {
-                          items(6){
-                            Box(modifier = Modifier.padding(horizontal = 8.dp)){
-                                LoadingCard(150.dp, width = 130.dp)
+                        LazyRow {
+                            items(6) {
+                                Box(modifier = Modifier.padding(horizontal = 8.dp)) {
+                                    LoadingCard(150.dp, width = 130.dp)
+                                }
                             }
-                          }
-                      }
+                        }
                     }
                 }
                 
@@ -65,7 +62,10 @@ fun CategoryCompose(homeViewModel: HomeViewModel) {
                     val products = product.products
                     LazyRow(modifier = Modifier.padding(horizontal = 8.dp)) {
                         items(products) { product ->
-                            ProductCategoryCardCompose(product)
+                            ProductCategoryCardCompose(
+                                product,
+                                navHostController = navHostController
+                            )
                         }
                     }
                 }
