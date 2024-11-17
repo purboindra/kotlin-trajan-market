@@ -2,6 +2,9 @@ package com.example.trajanmarket.ui.screens.product.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,9 +31,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trajanmarket.data.model.State
+import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
+import com.example.trajanmarket.ui.theme.blackSecondary
+import com.example.trajanmarket.utils.HorizontalSpacer
+import com.example.trajanmarket.utils.VerticalSpacer
 import androidx.compose.material.icons.Icons as Icons1
 
 @Composable
@@ -101,7 +109,31 @@ fun ProductDetailScreen(
                     
                     is State.Succes -> {
                         val product = (productByIdState as State.Succes).data
-                        Text("Success")
+                        Column {
+                            30.VerticalSpacer()
+                            Row {
+                                Column {
+                                    Text(
+                                        product.category,
+                                        fontWeight = FontWeight.W300,
+                                        color = blackSecondary
+                                    )
+                                    5.VerticalSpacer()
+                                    Text(
+                                        product.title,
+                                        fontWeight = FontWeight.W700,
+                                        fontSize = 18.sp,
+                                        color = blackSecondary
+                                    )
+                                }
+                                20.HorizontalSpacer()
+                                ReusableAsyncImageWithLoading(
+                                    imageUrl = product.thumbnail,
+                                    modifier = Modifier.width(170.dp).fillMaxHeight(),
+                                    contentDescription = product.title,
+                                )
+                            }
+                        }
                     }
                     
                     is State.Failure -> {
