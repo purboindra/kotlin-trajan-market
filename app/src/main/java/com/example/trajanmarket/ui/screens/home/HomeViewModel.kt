@@ -31,7 +31,11 @@ class HomeViewModel @Inject constructor(
     private val _productsByCategory = MutableStateFlow<State<Product>>(State.Idle)
     val productsByCategory: StateFlow<State<Product>> = _productsByCategory
     
-    fun fetchAllProducts(sortBy: String? = null, order: String? = null, limit: String? = null) =
+    private fun fetchAllProducts(
+        sortBy: String? = null,
+        order: String? = null,
+        limit: String? = null
+    ) =
         viewModelScope.launch {
             val product = productUseCase.invoke(sortBy, order, limit)
             product.collectLatest { state ->
@@ -44,18 +48,26 @@ class HomeViewModel @Inject constructor(
         fetchProductsByCategory(category)
     }
     
-    fun fetchCategoryProductList() = viewModelScope.launch {
+    private fun fetchCategoryProductList() = viewModelScope.launch {
         val categories = productUseCase.fetchCategoryProductList()
         categories.collectLatest { state ->
             _categories.emit(state)
         }
     }
     
-    fun fetchProductsByCategory(category: String) = viewModelScope.launch {
+    private fun fetchProductsByCategory(category: String) = viewModelScope.launch {
         val products = productUseCase.fetchProductsByCategory(category)
         products.collectLatest { state ->
             _productsByCategory.emit(state)
         }
+    }
+    
+    init {
+        fetchCategoryProductList()
+        fetchProductsByCategory("groceries")
+        fetchAllProducts(
+            sortBy = "order", order = "asc", limit = "10"
+        )
     }
     
 }
