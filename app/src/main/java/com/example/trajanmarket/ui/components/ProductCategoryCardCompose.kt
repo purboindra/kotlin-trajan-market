@@ -25,7 +25,7 @@ import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.VerticalSpacer
 
 @Composable
-fun ProductCategoryCardCompose( product: Product.Product){
+fun ProductCategoryCardCompose(product: Product.Product, showPrice: Boolean = false) {
     Surface(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 6.dp),
@@ -62,6 +62,12 @@ fun ProductCategoryCardCompose( product: Product.Product){
                 
                 8.VerticalSpacer()
                 
+                when {
+                    showPrice -> {
+                        Text("\$ ${product.price}",  fontWeight = FontWeight.W700,)
+                        14.VerticalSpacer()
+                    }
+                }
             }
         }
     }
