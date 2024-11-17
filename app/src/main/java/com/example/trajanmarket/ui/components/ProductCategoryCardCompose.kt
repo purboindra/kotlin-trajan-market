@@ -22,7 +22,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.trajanmarket.data.model.Product
-import com.example.trajanmarket.ui.screens.product.detail.ProductDetail
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.VerticalSpacer
 
@@ -38,7 +37,9 @@ fun ProductCategoryCardCompose(
         color = grayLight,
         shape = RoundedCornerShape(18),
         onClick = {
-            navHostController.navigate(com.example.trajanmarket.ui.navigation.ProductDetail(product.id.toString()))
+            navHostController.navigate(
+                route = "product_detail/${product.id}"
+            )
         }
     ) {
         Box(

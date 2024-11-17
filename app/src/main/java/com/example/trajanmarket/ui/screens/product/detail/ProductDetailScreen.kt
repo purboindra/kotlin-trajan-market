@@ -2,8 +2,7 @@ package com.example.trajanmarket.ui.screens.product.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
@@ -14,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
 import androidx.compose.material.icons.Icons as Icons1
 
@@ -88,9 +89,27 @@ fun ProductDetailScreen(
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
             item {
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
+                when (productByIdState) {
+                    is State.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
                     
+                    is State.Succes -> {
+                        val product = (productByIdState as State.Succes).data
+                        Text("Success")
+                    }
+                    
+                    is State.Failure -> {
+                        val throwable = (productByIdState as State.Failure).throwable
+                        Text(throwable.message ?: "Unknown Error")
+                    }
+                    
+                    else -> {}
                 }
             }
         }
