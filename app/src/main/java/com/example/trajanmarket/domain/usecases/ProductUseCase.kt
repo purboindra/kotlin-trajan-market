@@ -7,9 +7,15 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetProductUseCase @Inject constructor(private val productRepository: ProductRepository) {
-    suspend operator fun invoke(): Flow<State<Product>> = productRepository.fetchAllProducts()
-    suspend fun fetchProductsByCategory(category: String) =
+    operator fun invoke(
+        sortBy: String?,
+        order: String?,
+        limit: String?
+    ): Flow<State<Product>> =
+        productRepository.fetchAllProducts(sortBy, order, limit)
+    
+    fun fetchProductsByCategory(category: String) =
         productRepository.fetchProductsByCategory(category)
     
-    suspend fun fetchCategoryProductList() = productRepository.fetchCategoryProductList()
+    fun fetchCategoryProductList() = productRepository.fetchCategoryProductList()
 }

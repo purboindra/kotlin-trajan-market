@@ -20,9 +20,13 @@ class ProductViewModel @Inject constructor(
     private val _productState = MutableStateFlow<State<Product>>(State.Idle)
     var productState: StateFlow<State<Product>> = _productState
     
-    private fun fetchAllProducts() {
+    private fun fetchAllProducts(
+        sortBy: String? = null,
+        order: String? = null,
+        limit: String? = null
+    ) {
         viewModelScope.launch {
-            getProductUseCase().collectLatest { state ->
+            getProductUseCase(sortBy, order, limit).collectLatest { state ->
                 _productState.value = state
             }
         }

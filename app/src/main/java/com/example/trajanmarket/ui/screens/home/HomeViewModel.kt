@@ -31,12 +31,13 @@ class HomeViewModel @Inject constructor(
     private val _productsByCategory = MutableStateFlow<State<Product>>(State.Idle)
     val productsByCategory: StateFlow<State<Product>> = _productsByCategory
     
-    fun fetchAllProducts() = viewModelScope.launch {
-        val product = productUseCase.invoke()
-        product.collectLatest { state ->
-            _products.emit(state)
+    fun fetchAllProducts(sortBy: String? = null, order: String? = null, limit: String? = null) =
+        viewModelScope.launch {
+            val product = productUseCase.invoke(sortBy, order, limit)
+            product.collectLatest { state ->
+                _products.emit(state)
+            }
         }
-    }
     
     fun onCategorySelect(category: String) {
         _selectedCategory.update { category }
