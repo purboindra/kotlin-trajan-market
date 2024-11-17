@@ -27,9 +27,6 @@ fun CategoriesCompose(homeViewModel: HomeViewModel) {
     val categoriesState by homeViewModel.categories.collectAsState()
     val selectedCategory by homeViewModel.selectedCategory.collectAsState()
     
-    LaunchedEffect(Unit) {
-        homeViewModel.fetchCategoryProductList()
-    }
     
     Box(
         modifier = Modifier
