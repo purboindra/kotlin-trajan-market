@@ -48,5 +48,15 @@ class ProductRepository(private val api: ProductApi) {
             emit(State.Failure(e))
         }
     }
+    
+    fun fetchProductById(id: String) = flow<State<Product.Product>> {
+        emit(State.Loading)
+        try {
+            val product = api.fetchProductById(id)
+            emit(State.Succes(product))
+        } catch (e: Exception) {
+            emit(State.Failure(e))
+        }
+    }
 }
 

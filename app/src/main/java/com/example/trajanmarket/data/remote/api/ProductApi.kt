@@ -31,4 +31,7 @@ class ProductApi(private val client: HttpClient) {
     
     suspend fun fetchCategoryProductList(): List<String> =
         client.get("products/category-list").body()
+    
+    suspend fun fetchProductById(id: String): Product.Product = client.get("products/${id}").body()
+    
 }

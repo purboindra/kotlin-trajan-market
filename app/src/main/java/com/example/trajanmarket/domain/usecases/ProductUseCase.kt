@@ -18,4 +18,6 @@ class GetProductUseCase @Inject constructor(private val productRepository: Produ
         productRepository.fetchProductsByCategory(category)
     
     fun fetchCategoryProductList() = productRepository.fetchCategoryProductList()
+    
+    fun fetchProductById(id: String) = productRepository.fetchProductById(id)
 }
