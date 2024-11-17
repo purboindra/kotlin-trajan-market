@@ -17,20 +17,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.trajanmarket.data.model.Product
+import com.example.trajanmarket.ui.screens.product.detail.ProductDetail
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.VerticalSpacer
 
 @Composable
-fun ProductCategoryCardCompose(product: Product.Product, showPrice: Boolean = false) {
+fun ProductCategoryCardCompose(
+    product: Product.Product,
+    showPrice: Boolean = false,
+    navHostController: NavHostController
+) {
     Surface(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 6.dp),
         color = grayLight,
-        shape = RoundedCornerShape(18)
+        shape = RoundedCornerShape(18),
+        onClick = {
+            navHostController.navigate(com.example.trajanmarket.ui.navigation.ProductDetail(product.id.toString()))
+        }
     ) {
         Box(
             modifier = Modifier
@@ -64,7 +73,7 @@ fun ProductCategoryCardCompose(product: Product.Product, showPrice: Boolean = fa
                 
                 when {
                     showPrice -> {
-                        Text("\$ ${product.price}",  fontWeight = FontWeight.W700,)
+                        Text("\$ ${product.price}", fontWeight = FontWeight.W700)
                         14.VerticalSpacer()
                     }
                 }
