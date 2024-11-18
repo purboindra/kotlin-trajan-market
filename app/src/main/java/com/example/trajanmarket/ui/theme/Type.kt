@@ -18,15 +18,20 @@ val Typography = Typography(
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.W700,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
         color = blackSecondary,
     ),
     titleMedium = TextStyle(
-        fontWeight = FontWeight.W700,
+        fontWeight = FontWeight.W600,
         fontSize = 18.sp,
+        color = blackSecondary,
+    ),
+    titleSmall = TextStyle(
+        fontWeight = FontWeight.W500,
+        fontSize = 16.sp,
         color = blackSecondary,
     ),
     labelLarge = TextStyle(
