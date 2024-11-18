@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
@@ -37,6 +38,7 @@ import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
 import com.example.trajanmarket.ui.theme.blackSecondary
+import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.utils.HorizontalSpacer
 import com.example.trajanmarket.utils.VerticalSpacer
 import androidx.compose.material.icons.Icons as Icons1
@@ -106,32 +108,36 @@ fun ProductDetailScreen(
                             CircularProgressIndicator()
                         }
                     }
-                    
                     is State.Succes -> {
                         val product = (productByIdState as State.Succes).data
                         Column {
                             30.VerticalSpacer()
                             Row {
-                                Column {
+                                Column(modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()) {
                                     Text(
                                         product.category,
-                                        fontWeight = FontWeight.W300,
-                                        color = blackSecondary
+                                        style = MaterialTheme.typography.labelLarge.copy(
+                                            color = gray1
+                                        ),
                                     )
                                     5.VerticalSpacer()
                                     Text(
                                         product.title,
-                                        fontWeight = FontWeight.W700,
-                                        fontSize = 18.sp,
-                                        color = blackSecondary
+                                        style = MaterialTheme.typography.titleMedium,
                                     )
                                 }
                                 20.HorizontalSpacer()
-                                ReusableAsyncImageWithLoading(
-                                    imageUrl = product.thumbnail,
-                                    modifier = Modifier.width(170.dp).fillMaxHeight(),
-                                    contentDescription = product.title,
-                                )
+                                Box(modifier = Modifier.width(170.dp)) {
+                                    ReusableAsyncImageWithLoading(
+                                        imageUrl = product.thumbnail,
+                                        modifier = Modifier
+                                            .width(170.dp)
+                                            .fillMaxHeight(),
+                                        contentDescription = product.title,
+                                    )
+                                }
                             }
                         }
                     }
