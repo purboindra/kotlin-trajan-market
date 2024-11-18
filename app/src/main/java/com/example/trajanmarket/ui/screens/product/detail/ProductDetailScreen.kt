@@ -1,5 +1,6 @@
 package com.example.trajanmarket.ui.screens.product.detail
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,19 +33,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
-import com.example.trajanmarket.ui.theme.blackSecondary
 import com.example.trajanmarket.ui.theme.gray1
+import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.HorizontalSpacer
 import com.example.trajanmarket.utils.VerticalSpacer
 import androidx.compose.material.icons.Icons as Icons1
 
+@SuppressLint("ResourceType")
 @Composable
 fun ProductDetailScreen(
     productViewModel: ProductViewModel = hiltViewModel(),
@@ -50,6 +56,7 @@ fun ProductDetailScreen(
 ) {
     
     val productByIdState by productViewModel.productByIdState.collectAsState()
+    val price by productViewModel.price.collectAsState()
     
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
@@ -57,7 +64,6 @@ fun ProductDetailScreen(
     
     Scaffold(
         modifier = Modifier
-            .safeContentPadding()
             .statusBarsPadding()
             .padding(horizontal = 8.dp, vertical = 12.dp),
         topBar = {
@@ -108,28 +114,22 @@ fun ProductDetailScreen(
                             CircularProgressIndicator()
                         }
                     }
+                    
                     is State.Succes -> {
                         val product = (productByIdState as State.Succes).data
                         Column {
-                            30.VerticalSpacer()
-                            Row {
-                                Column(modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()) {
-                                    Text(
-                                        product.category,
-                                        style = MaterialTheme.typography.labelLarge.copy(
-                                            color = gray1
-                                        ),
-                                    )
-                                    5.VerticalSpacer()
-                                    Text(
-                                        product.title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                    )
-                                }
-                                20.HorizontalSpacer()
-                                Box(modifier = Modifier.width(170.dp)) {
+                            10.VerticalSpacer()
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(220.dp),
+                                shape = RoundedCornerShape(6.dp),
+                                color = grayLight
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     ReusableAsyncImageWithLoading(
                                         imageUrl = product.thumbnail,
                                         modifier = Modifier
@@ -137,6 +137,61 @@ fun ProductDetailScreen(
                                             .fillMaxHeight(),
                                         contentDescription = product.title,
                                     )
+                                }
+                            }
+                            
+                            10.VerticalSpacer()
+                            
+                            Column(modifier = Modifier.safeContentPadding()) {
+                                Text(
+                                    product.category,
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        color = gray1
+                                    ),
+                                )
+                                5.VerticalSpacer()
+                                Text(
+                                    product.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                                
+                                10.VerticalSpacer()
+                                
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color.Red.copy(alpha = 0.1f)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 12.dp,
+                                            vertical = 8.dp
+                                        )
+                                    ) {
+                                        
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ticket_percent),
+                                            contentDescription = "Disc",
+                                            modifier = Modifier.size(32.dp),
+                                            tint = Color.Red,
+                                        )
+                                        
+                                        Text(
+                                            "$ ${product.price}",
+                                            style = MaterialTheme.typography.titleLarge.copy(
+                                                color = Color.Red.copy(0.7f)
+                                            ),
+                                        )
+                                        5.HorizontalSpacer()
+                                        Text(
+                                            "$${price}",
+                                            style = MaterialTheme.typography.labelMedium.copy(
+                                                textDecoration = TextDecoration.LineThrough,
+                                                fontWeight = FontWeight.W500,
+                                                color = Color.Red.copy(0.4f)
+                                            ),
+                                        )
+                                    }
                                 }
                             }
                         }
