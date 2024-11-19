@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
+import com.example.trajanmarket.ui.components.PriceContainerCompose
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
 import com.example.trajanmarket.ui.theme.gray1
@@ -108,7 +109,9 @@ fun ProductDetailScreen(
                 when (productByIdState) {
                     is State.Loading -> {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .height(400.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()
@@ -157,41 +160,8 @@ fun ProductDetailScreen(
                                 
                                 10.VerticalSpacer()
                                 
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = Color.Red.copy(alpha = 0.1f)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(
-                                            horizontal = 12.dp,
-                                            vertical = 8.dp
-                                        )
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ticket_percent),
-                                            contentDescription = "Disc",
-                                            modifier = Modifier.size(32.dp),
-                                            tint = Color.Red,
-                                        )
-                                        
-                                        Text(
-                                            "$ ${product.price}",
-                                            style = MaterialTheme.typography.titleLarge.copy(
-                                                color = Color.Red.copy(0.7f)
-                                            ),
-                                        )
-                                        5.HorizontalSpacer()
-                                        Text(
-                                            "$${price}",
-                                            style = MaterialTheme.typography.labelMedium.copy(
-                                                textDecoration = TextDecoration.LineThrough,
-                                                fontWeight = FontWeight.W500,
-                                                color = Color.Red.copy(0.4f)
-                                            ),
-                                        )
-                                    }
-                                }
+                                PriceContainerCompose(product, price)
+                                
                             }
                         }
                     }
