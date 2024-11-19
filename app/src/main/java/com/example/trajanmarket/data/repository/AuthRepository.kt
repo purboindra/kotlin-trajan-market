@@ -36,7 +36,7 @@ class AuthRepository(
                     Json.decodeFromString<LoginResponse>(responseBody)
                 
                 userPreferences.saveUserName(loginResponse.username)
-                userPreferences.saveIsLoggeddIn(true)
+                userPreferences.saveIsLoggedIn(true)
                 
                 emit(State.Succes(loginResponse))
             } else {
