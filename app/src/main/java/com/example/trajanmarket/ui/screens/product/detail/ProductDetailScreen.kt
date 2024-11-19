@@ -168,7 +168,6 @@ fun ProductDetailScreen(
                                             vertical = 8.dp
                                         )
                                     ) {
-                                        
                                         Icon(
                                             painter = painterResource(id = R.drawable.ticket_percent),
                                             contentDescription = "Disc",

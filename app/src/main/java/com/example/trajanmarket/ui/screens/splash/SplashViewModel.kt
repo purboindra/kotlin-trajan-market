@@ -22,9 +22,9 @@ class SplashViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             userPreferences.isLoggedIn.collect { isLoggedIn ->
-                if (isLoggedIn != null) {
+                isLoggedIn.let {
                     delay(2000)
-                    _navigationEvent.emit(isLoggedIn)
+                    _navigationEvent.emit(it)
                 }
             }
         }
