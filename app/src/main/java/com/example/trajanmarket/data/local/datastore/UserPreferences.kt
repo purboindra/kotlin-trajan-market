@@ -26,7 +26,7 @@ class UserPreferences(private val context: Context) {
         }
     }
     
-    suspend fun saveIsLoggeddIn(isLoggedIn: Boolean) {
+    suspend fun saveIsLoggedIn(isLoggedIn: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.IS_LOGGED_IN] = isLoggedIn
         }
