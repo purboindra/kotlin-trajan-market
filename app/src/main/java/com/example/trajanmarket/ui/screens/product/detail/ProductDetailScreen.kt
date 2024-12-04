@@ -1,6 +1,9 @@
 package com.example.trajanmarket.ui.screens.product.detail
 
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,12 +18,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,16 +43,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.PriceContainerCompose
+import com.example.trajanmarket.ui.components.ReturnPolicyCompose
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
+import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.HorizontalSpacer
@@ -102,6 +112,24 @@ fun ProductDetailScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            ElevatedButton(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(
+                    8.dp
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = blue100,
+                ),
+                onClick = {}
+            ) {
+                Text(
+                    "+ Keranjang", style = MaterialTheme.typography.titleSmall.copy(
+                        color = Color.White,
+                    )
+                )
+            }
         }
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
@@ -146,6 +174,26 @@ fun ProductDetailScreen(
                             10.VerticalSpacer()
                             
                             Column(modifier = Modifier.safeContentPadding()) {
+                                
+                                5.VerticalSpacer()
+                                
+                                LazyRow() {
+                                    items(product.images) { item ->
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            ReusableAsyncImageWithLoading(
+                                                imageUrl = item,
+                                                modifier = Modifier
+                                                    .width(64.dp)
+                                                    .height(64.dp),
+                                                contentDescription = "Image Preview",
+                                            )
+                                        }
+                                    }
+                                }
+                                
                                 Text(
                                     product.category,
                                     style = MaterialTheme.typography.labelLarge.copy(
@@ -161,7 +209,63 @@ fun ProductDetailScreen(
                                 10.VerticalSpacer()
                                 
                                 PriceContainerCompose(product, price)
-                                
+                                8.VerticalSpacer()
+                                HorizontalDivider(
+                                    thickness = 1.dp, color = gray1.copy(
+                                        0.5f
+                                    )
+                                )
+                                8.VerticalSpacer()
+                                Text(
+                                    product.description,
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        color = Color.Black.copy(0.8f),
+                                    ),
+                                )
+                                13.VerticalSpacer()
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("Tersisa", style = MaterialTheme.typography.labelLarge)
+                                    5.HorizontalSpacer()
+                                    Text(
+                                        product.stock.toString(),
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                    8.HorizontalSpacer()
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        border = BorderStroke(1.dp, gray1),
+                                        modifier = Modifier.align(Alignment.CenterVertically)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(
+                                                vertical = 5.dp,
+                                                horizontal = 9.dp
+                                            ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Star, contentDescription = null,
+                                                tint = Color.Yellow.copy(
+                                                    0.8f
+                                                ),
+                                                modifier = Modifier.size(18.dp),
+                                            )
+                                            3.HorizontalSpacer()
+                                            Text(
+                                                "(${product.rating})",
+                                                style = MaterialTheme.typography.labelLarge.copy(
+                                                    color = gray1.copy(
+                                                        0.8f,
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                                15.VerticalSpacer()
+                                ReturnPolicyCompose(
+                                    policyText = product.returnPolicy, modifier = Modifier
+                                )
                             }
                         }
                     }
