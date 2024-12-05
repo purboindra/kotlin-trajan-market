@@ -1,6 +1,5 @@
 package com.example.trajanmarket.data.remote.api
 
-import com.example.trajanmarket.data.model.Categories
 import com.example.trajanmarket.data.model.Product
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -33,5 +32,4 @@ class ProductApi(private val client: HttpClient) {
         client.get("products/category-list").body()
     
     suspend fun fetchProductById(id: String): Product.Product = client.get("products/${id}").body()
-    
 }
