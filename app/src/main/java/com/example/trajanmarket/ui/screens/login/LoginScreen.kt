@@ -129,6 +129,7 @@ fun LoginScreen(
                         
                         if (password.isBlank()) {
                             loginViewModel.onPasswordErrorChange("Password cannot be empty!")
+                            return@ElevatedButton
                         }
                         
                         if (passwordError == null && userNameError == null) {
