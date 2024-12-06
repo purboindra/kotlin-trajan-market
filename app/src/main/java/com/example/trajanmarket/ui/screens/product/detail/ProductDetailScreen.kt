@@ -3,8 +3,10 @@ package com.example.trajanmarket.ui.screens.product.detail
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,11 +36,16 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trajanmarket.data.model.State
+import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.ui.components.PriceContainerCompose
 import com.example.trajanmarket.ui.components.ReturnPolicyCompose
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
@@ -57,6 +65,7 @@ import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.utils.HorizontalSpacer
 import com.example.trajanmarket.utils.VerticalSpacer
+import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons as Icons1
 
 @SuppressLint("ResourceType")
@@ -68,12 +77,29 @@ fun ProductDetailScreen(
     
     val productByIdState by productViewModel.productByIdState.collectAsState()
     val price by productViewModel.price.collectAsState()
+    val addToCartState by productViewModel.addToCartState.collectAsState()
+    
+    val coroutineScope = rememberCoroutineScope()
+    
+    val snackbarHostState = remember { SnackbarHostState() }
     
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
     }
     
+    LaunchedEffect(addToCartState) {
+        if (addToCartState is State.Failure) {
+            val throwable = (addToCartState as State.Failure).throwable
+            snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
+        }
+    }
+    
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(containerColor = Color.Red, snackbarData = data)
+            }
+        },
         modifier = Modifier
             .statusBarsPadding()
             .padding(horizontal = 8.dp, vertical = 12.dp),
@@ -122,13 +148,41 @@ fun ProductDetailScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = blue100,
                 ),
-                onClick = {}
+                enabled = addToCartState !is State.Loading,
+                onClick = {
+                    Log.d("onTappp", "add to cart")
+                    coroutineScope.launch {
+                        productViewModel.addToCart(
+                            listOf(
+                                AddToCartParams(
+                                    id = "1",
+                                    quantity = 1
+                                )
+                            )
+                        )
+                    }
+                }
             ) {
-                Text(
-                    "+ Keranjang", style = MaterialTheme.typography.titleSmall.copy(
-                        color = Color.White,
+                if (addToCartState is State.Loading) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(26.dp),
+                            color = grayLight,
+                            strokeWidth = 5.dp
+                        )
+                    }
+                } else {
+                    Text(
+                        "+ Keranjang", style = MaterialTheme.typography.titleSmall.copy(
+                            color = Color.White,
+                        )
                     )
-                )
+                }
+                
+                
             }
         }
     ) { paddingValues ->

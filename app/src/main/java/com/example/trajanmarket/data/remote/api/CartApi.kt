@@ -6,15 +6,28 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AddToCartParams(
+    val id: String,
+    val quantity: Int
+)
+
+@Serializable
+data class AddToCartRequestParams(
+    val userId: String,
+    val products: List<AddToCartParams>
+)
 
 class CartApi(private val client: HttpClient) {
-    suspend fun addToCart(products: List<Map<String, Any>>, userId: String): HttpResponse =
+    suspend fun addToCart(products: List<AddToCartParams>, userId: String): HttpResponse =
         client.post("carts/add") {
             contentType(ContentType.Application.Json)
             setBody(
-                mapOf(
-                    "userId" to userId,
-                    "products" to products,
+                AddToCartRequestParams(
+                    userId,
+                    products,
                 )
             )
         }
