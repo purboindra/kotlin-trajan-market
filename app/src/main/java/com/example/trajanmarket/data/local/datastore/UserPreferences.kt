@@ -3,14 +3,35 @@ package com.example.trajanmarket.data.local.datastore
 import PreferencesKey
 import android.content.Context
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class UserPreferences(private val context: Context) {
+    
+    suspend fun clear() {
+        context.dataStore.edit { preference ->
+            preference.clear()
+        }
+    }
+    
+    suspend fun remove(key: String) {
+        val preferencesKey = stringPreferencesKey(key)
+        context.dataStore.edit { preference ->
+            preference.remove(preferencesKey)
+        }
+    }
+    
     suspend fun saveUserName(userName: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.USER_NAME] = userName
+        }
+    }
+    
+    suspend fun saveUserId(id: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKey.USER_ID] = id
         }
     }
     
