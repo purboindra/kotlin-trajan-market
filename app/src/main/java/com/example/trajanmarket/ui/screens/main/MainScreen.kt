@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.trajanmarket.ui.components.BottomNavigationBar
 import com.example.trajanmarket.ui.screens.home.HomeScreen
+import com.example.trajanmarket.ui.screens.profile.ProfileScreen
 
 @Composable
 fun MainScreen(
@@ -50,13 +51,7 @@ fun MainScreen(
             }
         },
         {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(text = "Placeholder for Profile")
-            }
+            ProfileScreen(navHostController = navHostController)
         }
     )
     
