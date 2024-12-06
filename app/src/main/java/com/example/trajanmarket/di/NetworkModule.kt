@@ -2,9 +2,11 @@ package com.example.trajanmarket.di
 
 import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.remote.api.AuthApi
+import com.example.trajanmarket.data.remote.api.CartApi
 import com.example.trajanmarket.data.remote.api.ProductApi
 import com.example.trajanmarket.data.remote.service.HttpClientProvider
 import com.example.trajanmarket.data.repository.AuthRepository
+import com.example.trajanmarket.data.repository.CartRepository
 import com.example.trajanmarket.data.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
@@ -26,7 +28,16 @@ object NetworkModule {
     
     @Provides
     @Singleton
+    fun provideCartApi(client: HttpClient): CartApi = CartApi(client)
+    
+    @Provides
+    @Singleton
     fun provideProductRepository(api: ProductApi) = ProductRepository(api)
+    
+    @Provides
+    @Singleton
+    fun provideCartRepository(api: CartApi, userPreferences: UserPreferences) =
+        CartRepository(api, userPreferences)
     
     // AUTH
     @Provides
