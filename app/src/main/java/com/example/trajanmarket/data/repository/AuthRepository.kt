@@ -31,10 +31,7 @@ class AuthRepository(
                 val responseBody = response.bodyAsText()
                 val loginResponse: LoginResponse =
                     Json.decodeFromString<LoginResponse>(responseBody)
-                
                 userPreferences.saveUserName(loginResponse.username)
-                userPreferences.saveIsLoggedIn(true)
-                
                 emit(State.Succes(loginResponse))
             } else {
                 val errorText = response.bodyAsText()
