@@ -19,3 +19,5 @@ val background = Color(0xFFFFFBFE)
 val blackSecondary = Color(0xff171717)
 
 val gray1 = Color(0xffAEAEB2)
+
+val green = Color(0xff4a934a)
