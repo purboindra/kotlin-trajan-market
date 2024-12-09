@@ -21,10 +21,10 @@ class SplashViewModel @Inject constructor(
     
     init {
         viewModelScope.launch {
-            userPreferences.isLoggedIn.collect { isLoggedIn ->
-                isLoggedIn.let {
+            userPreferences.userId.collect { userId ->
+                userId.let {
                     delay(2000)
-                    _navigationEvent.emit(it)
+                    _navigationEvent.emit(it != null)
                 }
             }
         }
