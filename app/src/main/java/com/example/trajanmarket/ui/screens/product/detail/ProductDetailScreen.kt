@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -44,8 +45,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,6 +66,7 @@ import com.example.trajanmarket.ui.screens.product.ProductViewModel
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.ui.theme.grayLight
+import com.example.trajanmarket.ui.theme.green
 import com.example.trajanmarket.utils.HorizontalSpacer
 import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
@@ -83,21 +87,36 @@ fun ProductDetailScreen(
     
     val snackbarHostState = remember { SnackbarHostState() }
     
+    var snackbarColor by remember {
+        mutableStateOf(Color.Red)
+    }
+    
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
     }
     
     LaunchedEffect(addToCartState) {
-        if (addToCartState is State.Failure) {
-            val throwable = (addToCartState as State.Failure).throwable
-            snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
+        
+        when (addToCartState) {
+            is State.Failure -> {
+                val throwable = (addToCartState as State.Failure).throwable
+                snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
+            }
+            
+            is State.Succes -> {
+                snackbarHostState.showSnackbar("Success add to cart!")
+                snackbarColor = green
+            }
+            
+            else -> {}
         }
+        
     }
     
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(containerColor = Color.Red, snackbarData = data)
+                Snackbar(containerColor = snackbarColor, snackbarData = data)
             }
         },
         modifier = Modifier
