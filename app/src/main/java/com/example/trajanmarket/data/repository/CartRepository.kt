@@ -21,7 +21,7 @@ class CartRepository(private val cartApi: CartApi, private val userPreferences: 
         
         emit(State.Loading)
         try {
-            val userId = userPreferences.userName.first() ?: throw Exception("User not valid")
+            val userId = userPreferences.userId.first() ?: throw Exception("User not valid")
             
             val response = cartApi.addToCart(products,  userId)
             
