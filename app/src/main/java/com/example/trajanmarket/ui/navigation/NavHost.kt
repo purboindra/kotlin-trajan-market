@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.example.trajanmarket.ui.screens.login.LoginScreen
 import com.example.trajanmarket.ui.screens.main.MainScreen
 import com.example.trajanmarket.ui.screens.product.detail.ProductDetailScreen
+import com.example.trajanmarket.ui.screens.profile.ProfileScreen
 import com.example.trajanmarket.ui.screens.splash.SplashScreen
 
 @Composable
@@ -28,6 +29,9 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             }
             composable<Main> {
                 MainScreen(navHostController = navController)
+            }
+            composable<Profile> {
+                ProfileScreen(navHostController = navController)
             }
             composable(
                 route = "product_detail/{productId}",

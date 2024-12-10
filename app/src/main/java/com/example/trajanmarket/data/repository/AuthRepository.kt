@@ -6,11 +6,8 @@ import com.example.trajanmarket.data.model.LoginResponse
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AuthApi
 import com.example.trajanmarket.data.remote.service.ParsedClientException
-import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -34,10 +31,8 @@ class AuthRepository(
                 val responseBody = response.bodyAsText()
                 val loginResponse: LoginResponse =
                     Json.decodeFromString<LoginResponse>(responseBody)
-                
                 userPreferences.saveUserName(loginResponse.username)
-                userPreferences.saveIsLoggedIn(true)
-                
+                userPreferences.saveUserId(loginResponse.id.toString())
                 emit(State.Succes(loginResponse))
             } else {
                 val errorText = response.bodyAsText()

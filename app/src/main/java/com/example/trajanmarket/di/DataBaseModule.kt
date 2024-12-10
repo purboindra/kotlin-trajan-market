@@ -3,6 +3,7 @@ package com.example.trajanmarket.di
 import android.content.Context
 import androidx.room.Room
 import com.example.trajanmarket.data.local.AppDatabase
+import com.example.trajanmarket.data.local.CartDao
 import com.example.trajanmarket.data.local.UserDao
 import com.example.trajanmarket.data.local.datastore.UserPreferences
 import dagger.Module
@@ -24,6 +25,11 @@ object DataBaseModule {
     @Provides
     fun providerUserDao(db: AppDatabase): UserDao {
         return db.userDao()
+    }
+    
+    @Provides
+    fun providerCartDao(db: AppDatabase): CartDao {
+        return db.cartDao()
     }
     
     // LOCAL STORAGE OR DATA STORE

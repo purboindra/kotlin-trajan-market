@@ -15,16 +15,16 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     userPreferences: UserPreferences,
 ) : ViewModel() {
-
+    
     private val _navigationEvent = MutableSharedFlow<Boolean>(replay = 1)
     val navigationEvent: SharedFlow<Boolean> = _navigationEvent.asSharedFlow()
-
+    
     init {
         viewModelScope.launch {
-            userPreferences.isLoggedIn.collect { isLoggedIn ->
-                isLoggedIn.let {
+            userPreferences.userId.collect { userId ->
+                userId.let {
                     delay(2000)
-                    _navigationEvent.emit(it)
+                    _navigationEvent.emit(it != null)
                 }
             }
         }
