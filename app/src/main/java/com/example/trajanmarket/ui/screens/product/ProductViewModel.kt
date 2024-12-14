@@ -31,8 +31,6 @@ class ProductViewModel @Inject constructor(
     private val _productByIdState = MutableStateFlow<State<Product.Product>>(State.Idle)
     val productByIdState: StateFlow<State<Product.Product>> = _productByIdState
     
-    private val _addToCartState = MutableStateFlow<State<Boolean>>(State.Idle)
-    val addToCartState: StateFlow<State<Boolean>> = _addToCartState
     
     @SuppressLint("DefaultLocale")
     private fun getOriginalPrice(discountPercentage: Double, discountPrice: Double) {
@@ -51,16 +49,10 @@ class ProductViewModel @Inject constructor(
             if (state is State.Succes) {
                 val product = state.data
                 getOriginalPrice(
-                    discountPercentage = product.discountPercentage,
-                    discountPrice = product.price
+                    discountPercentage = product.discountPercentage, discountPrice = product.price
                 )
             }
         }
     }
     
-    fun addToCart(products: List<AddToCartParams>) = viewModelScope.launch {
-        cartUseCase.addToCart(products).collectLatest { state ->
-            _addToCartState.value = state
-        }
-    }
 }
