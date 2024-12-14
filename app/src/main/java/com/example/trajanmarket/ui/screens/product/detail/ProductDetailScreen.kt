@@ -80,9 +80,10 @@ fun ProductDetailScreen(
     
     val productByIdState by productViewModel.productByIdState.collectAsState()
     val price by productViewModel.price.collectAsState()
+    val hasProductInCart by productViewModel.hasProductInCart.collectAsState()
     val addToCartState by cartViewModel.addToCartState.collectAsState()
-    
     val cartListState by cartViewModel.cartListState.collectAsState()
+    val removeFromCartState by cartViewModel.removeFromCartState.collectAsState()
     
     val coroutineScope = rememberCoroutineScope()
     
@@ -95,10 +96,10 @@ fun ProductDetailScreen(
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
         cartViewModel.getCarts()
+        productViewModel.checkProductInCart(id)
     }
     
     LaunchedEffect(addToCartState) {
-        
         when (addToCartState) {
             is State.Failure -> {
                 val throwable = (addToCartState as State.Failure).throwable
@@ -107,13 +108,31 @@ fun ProductDetailScreen(
             
             is State.Succes -> {
                 cartViewModel.getCarts()
+                productViewModel.checkProductInCart(id)
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success add to cart!")
             }
             
             else -> {}
         }
-        
+    }
+    
+    LaunchedEffect(removeFromCartState) {
+        when (removeFromCartState) {
+            is State.Failure -> {
+                val throwable = (removeFromCartState as State.Failure).throwable
+                snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
+            }
+            
+            is State.Succes -> {
+                cartViewModel.getCarts()
+                productViewModel.checkProductInCart(id)
+                snackbarColor = green
+                snackbarHostState.showSnackbar("Success remove from cart!")
+            }
+            
+            else -> {}
+        }
     }
     
     Scaffold(
@@ -177,18 +196,22 @@ fun ProductDetailScreen(
                 enabled = addToCartState !is State.Loading,
                 onClick = {
                     coroutineScope.launch {
-                        cartViewModel.addToCart(
-                            listOf(
-                                AddToCartParams(
-                                    id = "1",
-                                    quantity = 1
+                        if (!hasProductInCart) {
+                            cartViewModel.addToCart(
+                                listOf(
+                                    AddToCartParams(
+                                        id = id,
+                                        quantity = 1
+                                    )
                                 )
                             )
-                        )
+                        } else {
+                            cartViewModel.removeFromCart(id)
+                        }
                     }
                 }
             ) {
-                if (addToCartState is State.Loading) {
+                if (addToCartState is State.Loading || removeFromCartState is State.Loading) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
@@ -201,7 +224,8 @@ fun ProductDetailScreen(
                     }
                 } else {
                     Text(
-                        "+ Keranjang", style = MaterialTheme.typography.titleSmall.copy(
+                        if (hasProductInCart) "Remove" else "+ Keranjang",
+                        style = MaterialTheme.typography.titleSmall.copy(
                             color = Color.White,
                         )
                     )
