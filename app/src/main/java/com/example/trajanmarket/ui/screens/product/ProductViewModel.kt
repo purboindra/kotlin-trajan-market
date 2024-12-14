@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +32,8 @@ class ProductViewModel @Inject constructor(
     private val _productByIdState = MutableStateFlow<State<Product.Product>>(State.Idle)
     val productByIdState: StateFlow<State<Product.Product>> = _productByIdState
     
+    private val _hasProductInCart = MutableStateFlow(false)
+    val hasProductInCart: StateFlow<Boolean> = _hasProductInCart
     
     @SuppressLint("DefaultLocale")
     private fun getOriginalPrice(discountPercentage: Double, discountPrice: Double) {
@@ -51,6 +54,18 @@ class ProductViewModel @Inject constructor(
                 getOriginalPrice(
                     discountPercentage = product.discountPercentage, discountPrice = product.price
                 )
+            }
+        }
+    }
+    
+    fun checkProductInCart(id: String) {
+        viewModelScope.launch {
+            cartUseCase.getCarts().map { cartListState ->
+                (cartListState as? State.Succes)?.data?.any { it.id == id.toInt() }
+            }.collect { isInCart ->
+                isInCart?.let {
+                    _hasProductInCart.value = it
+                }
             }
         }
     }
