@@ -19,6 +19,9 @@ class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : 
     private val _addToCartState = MutableStateFlow<State<Boolean>>(State.Idle)
     val addToCartState: StateFlow<State<Boolean>> = _addToCartState
     
+    private val _removeFromCartState = MutableStateFlow<State<Boolean>>(State.Idle)
+    val removeFromCartState: StateFlow<State<Boolean>> = _removeFromCartState
+    
     private val _cartListState =
         MutableStateFlow<State<List<CartEntity>>>(State.Succes(emptyList()))
     val cartListState: StateFlow<State<List<CartEntity>>> = _cartListState
@@ -26,6 +29,12 @@ class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : 
     fun addToCart(products: List<AddToCartParams>) = viewModelScope.launch {
         cartUseCase.addToCart(products).collectLatest { state ->
             _addToCartState.value = state
+        }
+    }
+    
+    fun removeFromCart(productId: String) = viewModelScope.launch {
+        cartUseCase.removeFromCart(productId).collectLatest { state ->
+            _removeFromCartState.value = state
         }
     }
     
