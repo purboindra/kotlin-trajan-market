@@ -3,7 +3,6 @@ package com.example.trajanmarket.ui.screens.product.detail
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +36,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -55,7 +53,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
@@ -63,6 +60,7 @@ import com.example.trajanmarket.ui.components.PriceContainerCompose
 import com.example.trajanmarket.ui.components.ReturnPolicyCompose
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
+import com.example.trajanmarket.ui.screens.viewmodel.CartViewModel
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.ui.theme.grayLight
@@ -76,12 +74,15 @@ import androidx.compose.material.icons.Icons as Icons1
 @Composable
 fun ProductDetailScreen(
     productViewModel: ProductViewModel = hiltViewModel(),
-    id: String
+    cartViewModel: CartViewModel = hiltViewModel(),
+    id: String,
 ) {
     
     val productByIdState by productViewModel.productByIdState.collectAsState()
     val price by productViewModel.price.collectAsState()
-    val addToCartState by productViewModel.addToCartState.collectAsState()
+    val addToCartState by cartViewModel.addToCartState.collectAsState()
+    
+    val cartListState by cartViewModel.cartListState.collectAsState()
     
     val coroutineScope = rememberCoroutineScope()
     
@@ -93,6 +94,7 @@ fun ProductDetailScreen(
     
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
+        cartViewModel.getCarts()
     }
     
     LaunchedEffect(addToCartState) {
@@ -104,8 +106,9 @@ fun ProductDetailScreen(
             }
             
             is State.Succes -> {
-                snackbarHostState.showSnackbar("Success add to cart!")
+                cartViewModel.getCarts()
                 snackbarColor = green
+                snackbarHostState.showSnackbar("Success add to cart!")
             }
             
             else -> {}
@@ -147,8 +150,12 @@ fun ProductDetailScreen(
                                 .background(Color.Black)
                                 .align(Alignment.BottomEnd)
                         ) {
-                            Text(
-                                "1",
+                            if (cartListState is State.Loading) CircularProgressIndicator(
+                                modifier = Modifier.size(26.dp),
+                                color = grayLight,
+                                strokeWidth = 5.dp
+                            ) else Text(
+                                "${(cartListState as? State.Succes)?.data?.size}",
                                 modifier = Modifier.align(Alignment.Center),
                                 fontWeight = FontWeight.W500,
                                 color = Color.White,
@@ -169,9 +176,8 @@ fun ProductDetailScreen(
                 ),
                 enabled = addToCartState !is State.Loading,
                 onClick = {
-                    Log.d("onTappp", "add to cart")
                     coroutineScope.launch {
-                        productViewModel.addToCart(
+                        cartViewModel.addToCart(
                             listOf(
                                 AddToCartParams(
                                     id = "1",
