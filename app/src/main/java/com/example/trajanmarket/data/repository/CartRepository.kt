@@ -56,8 +56,6 @@ class CartRepository(
     }
     
     fun getCarts(): Flow<State<List<CartEntity>>> = flow {
-        Log.d("getCarts", "Get carts cartRepository called")
-        
         try {
             val userId = userPreferences.userId.first()
             userId?.let {
@@ -70,4 +68,17 @@ class CartRepository(
         }
     }
     
+    fun removeFromCart(productId: String): Flow<State<Boolean>> = flow {
+        try {
+            val result = cartDao.removeFromCart(productId.toInt())
+            if (result > 0) {
+                emit(State.Succes(true))
+            } else {
+                emit(State.Failure(Throwable(message = "Failed delete product from cart")))
+            }
+        } catch (e: Throwable) {
+            Log.d("error removeFromCart", e.message ?: "Unknown error")
+            emit(State.Failure(e))
+        }
+    }
 }
