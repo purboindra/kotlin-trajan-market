@@ -60,13 +60,29 @@ class ProductViewModel @Inject constructor(
     
     fun checkProductInCart(id: String) {
         viewModelScope.launch {
-            cartUseCase.getCarts().map { cartListState ->
-                (cartListState as? State.Succes)?.data?.any { it.id == id.toInt() }
-            }.collect { isInCart ->
-                isInCart?.let {
-                    _hasProductInCart.value = it
+            cartUseCase.getCarts()
+                .map { cartListState ->
+                    val isProductInCart =
+                        (cartListState as? State.Succes)?.data?.any {
+                            (it.productId ?: -1) == id.toInt()
+                        }
+                    Log.d(
+                        "checkProductInCart",
+                        "cartListState: $cartListState, isProductInCart: $isProductInCart"
+                    )
+                    isProductInCart
                 }
-            }
+                .collect { isInCart ->
+                    isInCart?.let {
+                        Log.d(
+                            "checkProductInCart",
+                            "Updating state with: $isInCart for productId: $id"
+                        )
+                        _hasProductInCart.value = it
+                    } ?: run {
+                        Log.d("checkProductInCart", "isInCart is null for productId: $id")
+                    }
+                }
         }
     }
     
