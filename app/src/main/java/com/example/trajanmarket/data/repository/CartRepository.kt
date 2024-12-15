@@ -9,8 +9,10 @@ import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.data.remote.api.CartApi
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 
@@ -56,12 +58,16 @@ class CartRepository(
     }
     
     fun getCarts(): Flow<State<List<CartEntity>>> = flow {
+        emit(State.Loading)
         try {
-            val userId = userPreferences.userId.first()
-            userId?.let {
-                val result = cartDao.getCartByUserId(it.toInt())
-                emit(State.Succes(result))
+            val userId = userPreferences.userId.firstOrNull()
+            if (userId == null) {
+                emit(State.Failure(IllegalStateException("User ID is null")))
+                return@flow
             }
+            
+            val result = cartDao.getCartByUserId(userId.toInt())
+            emit(State.Succes(result))
         } catch (e: Throwable) {
             Log.d("error getCartByUserId", e.message ?: "Unknown error")
             emit(State.Failure(e))
@@ -69,7 +75,9 @@ class CartRepository(
     }
     
     fun removeFromCart(productId: String): Flow<State<Boolean>> = flow {
+        emit(State.Loading)
         try {
+            delay(1000)
             val result = cartDao.removeFromCart(productId.toInt())
             if (result > 0) {
                 emit(State.Succes(true))
