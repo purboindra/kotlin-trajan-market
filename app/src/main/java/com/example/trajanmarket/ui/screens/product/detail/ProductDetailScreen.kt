@@ -169,7 +169,7 @@ fun ProductDetailScreen(
                                 .background(Color.Black)
                                 .align(Alignment.BottomEnd)
                         ) {
-                            if (cartListState is State.Loading) CircularProgressIndicator(
+                            if (cartListState is State.Loading ) CircularProgressIndicator(
                                 modifier = Modifier.size(26.dp),
                                 color = grayLight,
                                 strokeWidth = 5.dp
@@ -193,7 +193,7 @@ fun ProductDetailScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = blue100,
                 ),
-                enabled = addToCartState !is State.Loading,
+                enabled = addToCartState !is State.Loading || removeFromCartState !is State.Loading,
                 onClick = {
                     coroutineScope.launch {
                         if (!hasProductInCart) {
