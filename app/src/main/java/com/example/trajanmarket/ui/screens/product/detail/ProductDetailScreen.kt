@@ -59,8 +59,8 @@ import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.ui.components.PriceContainerCompose
 import com.example.trajanmarket.ui.components.ReturnPolicyCompose
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
+import com.example.trajanmarket.ui.screens.cart.CartViewModel
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
-import com.example.trajanmarket.ui.screens.viewmodel.CartViewModel
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.ui.theme.grayLight
@@ -170,11 +170,16 @@ fun ProductDetailScreen(
                                 .background(Color.Black)
                                 .align(Alignment.BottomEnd)
                         ) {
-                            if (cartListState is State.Loading ) CircularProgressIndicator(
-                                modifier = Modifier.size(26.dp),
-                                color = grayLight,
-                                strokeWidth = 5.dp
-                            ) else Text(
+                            if (cartListState is State.Loading) Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = grayLight,
+                                    strokeWidth = 3.dp
+                                )
+                            } else Text(
                                 "${(cartListState as? State.Succes)?.data?.size}",
                                 modifier = Modifier.align(Alignment.Center),
                                 fontWeight = FontWeight.W500,
@@ -193,8 +198,11 @@ fun ProductDetailScreen(
                 ),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = blue100,
+                    disabledContainerColor = gray1,
                 ),
-                enabled = addToCartState !is State.Loading || removeFromCartState !is State.Loading,
+                enabled = addToCartState !is State.Loading &&
+                        removeFromCartState !is State.Loading &&
+                        cartListState !is State.Loading,
                 onClick = {
                     coroutineScope.launch {
                         if (!hasProductInCart) {
@@ -212,7 +220,7 @@ fun ProductDetailScreen(
                     }
                 }
             ) {
-                if (addToCartState is State.Loading || removeFromCartState is State.Loading) {
+                if (addToCartState is State.Loading || removeFromCartState is State.Loading || cartListState is State.Loading) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
