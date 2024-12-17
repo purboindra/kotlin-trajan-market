@@ -86,6 +86,25 @@ class CartRepository(
         }
     }
     
+    fun getLocalCarts(): Flow<State<List<CartEntity>>> = flow {
+        emit(State.Loading)
+        
+        try {
+            val userId = userPreferences.userId.firstOrNull()
+            if (userId == null) {
+                emit(State.Failure(IllegalStateException("User ID is null")))
+                return@flow
+            }
+            
+            val result = cartDao.getCartByUserId(userId.toInt())
+            
+            emit(State.Succes(result))
+        } catch (e: Throwable) {
+            Log.d("error getCartByUserId", e.message ?: "Unknown error")
+            emit(State.Failure(e))
+        }
+    }
+    
     fun removeFromCart(productId: String): Flow<State<Boolean>> = flow {
         emit(State.Loading)
         try {

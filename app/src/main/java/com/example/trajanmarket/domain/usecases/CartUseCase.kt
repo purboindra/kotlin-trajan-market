@@ -14,6 +14,8 @@ class CartUseCase @Inject constructor(private val cartRepository: CartRepository
     
     fun getCarts(): Flow<State<List<Product.Product>>> = cartRepository.getCarts()
     
+    fun getLocalCarts(): Flow<State<List<CartEntity>>> = cartRepository.getLocalCarts()
+    
     fun removeFromCart(productId: String): Flow<State<Boolean>> =
         cartRepository.removeFromCart(productId)
 }
