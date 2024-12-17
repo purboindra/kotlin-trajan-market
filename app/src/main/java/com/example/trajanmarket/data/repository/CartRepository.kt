@@ -4,9 +4,11 @@ import android.util.Log
 import com.example.trajanmarket.data.local.CartDao
 import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.model.CartEntity
+import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.data.remote.api.CartApi
+import com.example.trajanmarket.data.remote.api.ProductApi
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
@@ -19,6 +21,7 @@ import kotlinx.serialization.json.Json
 
 class CartRepository(
     private val cartApi: CartApi,
+    private val productApi: ProductApi,
     private val userPreferences: UserPreferences,
     private val cartDao: CartDao
 ) {
@@ -57,8 +60,11 @@ class CartRepository(
         }
     }
     
-    fun getCarts(): Flow<State<List<CartEntity>>> = flow {
+    fun getCarts(): Flow<State<List<Product.Product>>> = flow {
         emit(State.Loading)
+        
+        val productsTemp: MutableList<Product.Product> = arrayListOf()
+        
         try {
             val userId = userPreferences.userId.firstOrNull()
             if (userId == null) {
@@ -67,7 +73,13 @@ class CartRepository(
             }
             
             val result = cartDao.getCartByUserId(userId.toInt())
-            emit(State.Succes(result))
+            
+            for (product in result) {
+                val productResponse = productApi.fetchProductById(product.productId.toString())
+                productsTemp.add(productResponse)
+            }
+            
+            emit(State.Succes(productsTemp))
         } catch (e: Throwable) {
             Log.d("error getCartByUserId", e.message ?: "Unknown error")
             emit(State.Failure(e))
