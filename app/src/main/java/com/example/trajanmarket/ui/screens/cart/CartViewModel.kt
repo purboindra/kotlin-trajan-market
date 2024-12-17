@@ -2,6 +2,7 @@ package com.example.trajanmarket.ui.screens.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trajanmarket.data.model.CartEntity
 import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
@@ -25,6 +26,10 @@ class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : 
         MutableStateFlow<State<List<Product.Product>>>(State.Succes(emptyList()))
     val cartListState: StateFlow<State<List<Product.Product>>> = _cartListState
     
+    private val _cartLocalListState =
+        MutableStateFlow<State<List<CartEntity>>>(State.Succes(emptyList()))
+    val cartLocalListState: StateFlow<State<List<CartEntity>>> = _cartLocalListState
+    
     fun addToCart(products: List<AddToCartParams>) = viewModelScope.launch {
         cartUseCase.addToCart(products).collectLatest { state ->
             _addToCartState.value = state
@@ -34,6 +39,12 @@ class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : 
     fun removeFromCart(productId: String) = viewModelScope.launch {
         cartUseCase.removeFromCart(productId).collectLatest { state ->
             _removeFromCartState.value = state
+        }
+    }
+    
+    fun getLocalCarts() = viewModelScope.launch {
+        cartUseCase.getLocalCarts().collectLatest { state ->
+            _cartLocalListState.value = state
         }
     }
     
