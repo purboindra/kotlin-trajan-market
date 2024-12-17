@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.trajanmarket.ui.components.BottomNavigationBar
+import com.example.trajanmarket.ui.screens.cart.CartScreen
 import com.example.trajanmarket.ui.screens.home.HomeScreen
 import com.example.trajanmarket.ui.screens.profile.ProfileScreen
 
@@ -42,13 +43,7 @@ fun MainScreen(
             }
         },
         {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(text = "Placeholder for Ticket")
-            }
+            CartScreen(navHostController = navHostController)
         },
         {
             ProfileScreen(navHostController = navHostController)
