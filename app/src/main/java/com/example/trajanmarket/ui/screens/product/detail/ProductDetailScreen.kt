@@ -82,7 +82,7 @@ fun ProductDetailScreen(
     val price by productViewModel.price.collectAsState()
     val hasProductInCart by productViewModel.hasProductInCart.collectAsState()
     val addToCartState by cartViewModel.addToCartState.collectAsState()
-    val cartListState by cartViewModel.cartListState.collectAsState()
+    val cartLocalListState by cartViewModel.cartLocalListState.collectAsState()
     val removeFromCartState by cartViewModel.removeFromCartState.collectAsState()
     
     val coroutineScope = rememberCoroutineScope()
@@ -95,7 +95,7 @@ fun ProductDetailScreen(
     
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
-        cartViewModel.getCarts()
+        cartViewModel.getLocalCarts()
         productViewModel.checkProductInCart(id)
     }
     
@@ -107,7 +107,7 @@ fun ProductDetailScreen(
             }
             
             is State.Succes -> {
-                cartViewModel.getCarts()
+                cartViewModel.getLocalCarts()
                 productViewModel.checkProductInCart(id)
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success add to cart!")
@@ -126,7 +126,7 @@ fun ProductDetailScreen(
             }
             
             is State.Succes -> {
-                cartViewModel.getCarts()
+                cartViewModel.getLocalCarts()
                 productViewModel.checkProductInCart(id)
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success remove from cart!")
@@ -170,7 +170,7 @@ fun ProductDetailScreen(
                                 .background(Color.Black)
                                 .align(Alignment.BottomEnd)
                         ) {
-                            if (cartListState is State.Loading) Box(
+                            if (cartLocalListState is State.Loading) Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -180,7 +180,7 @@ fun ProductDetailScreen(
                                     strokeWidth = 3.dp
                                 )
                             } else Text(
-                                "${(cartListState as? State.Succes)?.data?.size}",
+                                "${(cartLocalListState as? State.Succes)?.data?.size}",
                                 modifier = Modifier.align(Alignment.Center),
                                 fontWeight = FontWeight.W500,
                                 color = Color.White,
@@ -202,7 +202,7 @@ fun ProductDetailScreen(
                 ),
                 enabled = addToCartState !is State.Loading &&
                         removeFromCartState !is State.Loading &&
-                        cartListState !is State.Loading,
+                        cartLocalListState !is State.Loading,
                 onClick = {
                     coroutineScope.launch {
                         if (!hasProductInCart) {
@@ -220,7 +220,7 @@ fun ProductDetailScreen(
                     }
                 }
             ) {
-                if (addToCartState is State.Loading || removeFromCartState is State.Loading || cartListState is State.Loading) {
+                if (addToCartState is State.Loading || removeFromCartState is State.Loading || cartLocalListState is State.Loading) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
