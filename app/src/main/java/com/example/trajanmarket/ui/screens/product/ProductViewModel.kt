@@ -60,7 +60,7 @@ class ProductViewModel @Inject constructor(
     
     fun checkProductInCart(id: String) {
         viewModelScope.launch {
-            cartUseCase.getCarts()
+            cartUseCase.getLocalCarts()
                 .map { cartListState ->
                     val isProductInCart =
                         (cartListState as? State.Succes)?.data?.any {
