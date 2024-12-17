@@ -1,5 +1,7 @@
 package com.example.trajanmarket.ui.screens.cart
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trajanmarket.data.model.CartEntity
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : ViewModel() {
@@ -52,6 +55,17 @@ class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : 
         cartUseCase.getCarts().collectLatest { state ->
             _cartListState.value = state
         }
+    }
+    
+    @SuppressLint("DefaultLocale")
+     fun getOriginalPrice(discountPercentage: Double, discountPrice: Double): Int? {
+        if (discountPercentage >= 100.0 || discountPercentage < 0) {
+            Log.e("getRealPrice", "Invalid discount percentage: $discountPercentage")
+            return null
+        }
+        val realPrice = discountPrice / (1 - (discountPercentage / 100))
+        val formattedNumber = String.format("%.2f", realPrice).toDouble()
+        return formattedNumber.roundToInt()
     }
     
 }
