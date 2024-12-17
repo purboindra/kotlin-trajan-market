@@ -121,6 +121,7 @@ fun ProductDetailScreen(
         when (removeFromCartState) {
             is State.Failure -> {
                 val throwable = (removeFromCartState as State.Failure).throwable
+                snackbarColor = Color.Red
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
             }
             
