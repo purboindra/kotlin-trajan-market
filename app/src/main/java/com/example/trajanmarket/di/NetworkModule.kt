@@ -37,8 +37,13 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideCartRepository(api: CartApi, userPreferences: UserPreferences, cartDao: CartDao) =
-        CartRepository(api, userPreferences, cartDao)
+    fun provideCartRepository(
+        api: CartApi,
+        productApi: ProductApi,
+        userPreferences: UserPreferences,
+        cartDao: CartDao
+    ) =
+        CartRepository(api, productApi, userPreferences, cartDao)
     
     // AUTH
     @Provides
