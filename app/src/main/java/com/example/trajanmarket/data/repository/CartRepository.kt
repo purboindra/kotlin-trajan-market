@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 
 class CartRepository(
@@ -63,8 +66,6 @@ class CartRepository(
     fun getCarts(): Flow<State<List<Product.Product>>> = flow {
         emit(State.Loading)
         
-        val productsTemp: MutableList<Product.Product> = arrayListOf()
-        
         try {
             val userId = userPreferences.userId.firstOrNull()
             if (userId == null) {
@@ -74,12 +75,13 @@ class CartRepository(
             
             val result = cartDao.getCartByUserId(userId.toInt())
             
-            for (product in result) {
-                val productResponse = productApi.fetchProductById(product.productId.toString())
-                productsTemp.add(productResponse)
+            val products = coroutineScope {
+                result.map { product ->
+                    async { productApi.fetchProductById(product.productId.toString()) }
+                }.awaitAll()
             }
             
-            emit(State.Succes(productsTemp))
+            emit(State.Succes(products))
         } catch (e: Throwable) {
             Log.d("error getCartByUserId", e.message ?: "Unknown error")
             emit(State.Failure(e))
