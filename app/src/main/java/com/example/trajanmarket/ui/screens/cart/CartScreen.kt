@@ -54,7 +54,7 @@ fun CartScreen(
                     Box(modifier = Modifier.fillParentMaxSize()) {
                         LazyColumn {
                             items(data) { item ->
-                                CartItem(item, cartViewModel, onClick = {
+                                CartItem(item, onClick = {
                                     handleClickItem(item.id)
                                 })
                             }
