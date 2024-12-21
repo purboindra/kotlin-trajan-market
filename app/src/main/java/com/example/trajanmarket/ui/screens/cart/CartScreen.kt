@@ -29,6 +29,10 @@ fun CartScreen(
         cartViewModel.getCarts()
     }
     
+    fun handleClickItem(id: Int) {
+        navHostController.navigate("product_detail/${id}")
+    }
+    
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -50,8 +54,9 @@ fun CartScreen(
                     Box(modifier = Modifier.fillParentMaxSize()) {
                         LazyColumn {
                             items(data) { item ->
-                                
-                                CartItem(item, cartViewModel)
+                                CartItem(item, cartViewModel, onClick = {
+                                    handleClickItem(item.id)
+                                })
                             }
                         }
                     }

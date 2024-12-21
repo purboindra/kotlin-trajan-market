@@ -1,5 +1,6 @@
 package com.example.trajanmarket.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +26,7 @@ import com.example.trajanmarket.utils.HorizontalSpacer
 import com.example.trajanmarket.utils.VerticalSpacer
 
 @Composable
-fun CartItem(product: Product.Product, cartViewModel: CartViewModel) {
+fun CartItem(product: Product.Product, cartViewModel: CartViewModel, onClick: () -> Unit) {
     val price = cartViewModel.getOriginalPrice(
         discountPercentage = product.discountPercentage,
         discountPrice = product.price
@@ -34,7 +35,9 @@ fun CartItem(product: Product.Product, cartViewModel: CartViewModel) {
         color = Color(0xffFFFFFF),
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp).padding(vertical = 5.dp)
+            .height(180.dp)
+            .padding(vertical = 5.dp)
+            .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)) {
             Box(
