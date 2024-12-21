@@ -20,14 +20,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.trajanmarket.data.model.Product
-import com.example.trajanmarket.ui.screens.cart.CartViewModel
 import com.example.trajanmarket.ui.theme.gray1
 import com.example.trajanmarket.utils.HorizontalSpacer
 import com.example.trajanmarket.utils.VerticalSpacer
+import com.example.trajanmarket.utils.getOriginalPrice
 
 @Composable
-fun CartItem(product: Product.Product, cartViewModel: CartViewModel, onClick: () -> Unit) {
-    val price = cartViewModel.getOriginalPrice(
+fun CartItem(product: Product.Product, onClick: () -> Unit) {
+    val price = getOriginalPrice(
         discountPercentage = product.discountPercentage,
         discountPrice = product.price
     )
