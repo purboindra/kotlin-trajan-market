@@ -1,3 +1,5 @@
+@file:Suppress("INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING")
+
 package com.example.trajanmarket.ui.screens.product.detail
 
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -5,6 +7,7 @@ package com.example.trajanmarket.ui.screens.product.detail
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.ui.components.PriceContainerCompose
@@ -75,9 +79,9 @@ import androidx.compose.material.icons.Icons as Icons1
 fun ProductDetailScreen(
     productViewModel: ProductViewModel = hiltViewModel(),
     cartViewModel: CartViewModel = hiltViewModel(),
+    navHostController: NavHostController,
     id: String,
 ) {
-    
     val productByIdState by productViewModel.productByIdState.collectAsState()
     val price by productViewModel.price.collectAsState()
     val hasProductInCart by productViewModel.hasProductInCart.collectAsState()
@@ -156,7 +160,10 @@ fun ProductDetailScreen(
                     Box(
                         modifier = Modifier
                             .height(48.dp)
-                            .width(48.dp),
+                            .width(48.dp)
+                            .clickable {
+                                navHostController.navigate(route = "main?bottomNavbarIndex=2")
+                            },
                     ) {
                         Icon(
                             Icons1.Outlined.ShoppingCart,
