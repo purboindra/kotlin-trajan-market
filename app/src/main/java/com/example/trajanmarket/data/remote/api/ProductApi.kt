@@ -32,4 +32,13 @@ class ProductApi(private val client: HttpClient) {
         client.get("products/category-list").body()
     
     suspend fun fetchProductById(id: String): Product.Product = client.get("products/${id}").body()
+    
+    suspend fun searchProduct(query: String?): Product =
+        client.get("products/search") {
+            url {
+                query?.let {
+                    parameters.append("q", it)
+                }
+            }
+        }.body()
 }
