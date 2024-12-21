@@ -12,7 +12,4 @@ object Main
 object Splash
 
 @Serializable
-data class ProductDetail(val id: String)
-
-@Serializable
 object Profile
