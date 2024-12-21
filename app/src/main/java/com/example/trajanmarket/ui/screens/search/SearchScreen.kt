@@ -47,10 +47,14 @@ fun SearchScreen(
     val query by searchViewModel.searchQuery.collectAsState()
     val searchState by searchViewModel.searchState.collectAsState()
     
-    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     
     val coroutineScope = rememberCoroutineScope()
+    
+    fun handleClickItem(id: String) {
+        navHostController.navigate("product_detail/$id")
+    }
+    
     
     DisposableEffect(lifecycleOwner) {
         val lifecycle = lifecycleOwner.lifecycle
@@ -116,7 +120,7 @@ fun SearchScreen(
                 LazyColumn {
                     items(product.products) { item ->
                         CartItem(item, onClick = {
-//                            handleClickItem(item.id)
+                            handleClickItem(item.id.toString())
                         })
                     }
                 }
