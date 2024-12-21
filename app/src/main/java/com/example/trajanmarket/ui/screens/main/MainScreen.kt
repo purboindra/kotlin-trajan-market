@@ -20,6 +20,7 @@ import com.example.trajanmarket.ui.components.BottomNavigationBar
 import com.example.trajanmarket.ui.screens.cart.CartScreen
 import com.example.trajanmarket.ui.screens.home.HomeScreen
 import com.example.trajanmarket.ui.screens.profile.ProfileScreen
+import com.example.trajanmarket.ui.screens.search.SearchScreen
 
 @Composable
 fun MainScreen(
@@ -35,13 +36,7 @@ fun MainScreen(
             HomeScreen(navHostController = navHostController)
         },
         {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(text = "Placeholder for Cinemas")
-            }
+            SearchScreen(navHostController)
         },
         {
             CartScreen(navHostController = navHostController)
