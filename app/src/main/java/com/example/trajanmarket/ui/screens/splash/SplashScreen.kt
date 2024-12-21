@@ -38,7 +38,7 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         splashViewModel.navigationEvent.collectLatest { state ->
             if (state) {
-                navHostController.navigate(Main) {
+                navHostController.navigate("main") {
                     popUpTo(Splash) { inclusive = true }
                 }
             } else {
