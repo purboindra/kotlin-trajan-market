@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,11 +24,11 @@ import com.example.trajanmarket.ui.screens.profile.ProfileScreen
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    bottomNavbar: Int?
 ) {
     
     val bottomNavbarIndex by mainViewModel.bottomNavbarIndex.collectAsState()
-    
     
     val bodies = listOf<@Composable () -> Unit>(
         {
@@ -49,6 +50,14 @@ fun MainScreen(
             ProfileScreen(navHostController = navHostController)
         }
     )
+    
+    LaunchedEffect(bottomNavbar) {
+        bottomNavbar?.let {
+            if (it != -1) {
+                mainViewModel.onChangeBottomNavbarIndex(it)
+            }
+        }
+    }
     
     Scaffold(
         bottomBar = {
