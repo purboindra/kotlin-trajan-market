@@ -5,8 +5,10 @@ import io.appwrite.Client
 
 object AppwriteClient {
     
-    private val API_KEY = BuildConfig.API_KEY
-    private val PROJECT_ID = BuildConfig.PROJECT_ID
+    private const val API_KEY = BuildConfig.API_KEY
+    private const val PROJECT_ID = BuildConfig.PROJECT_ID
+    
+    
     
     val client: Client by lazy {
         Client()

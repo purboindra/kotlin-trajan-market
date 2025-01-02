@@ -6,6 +6,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.appwrite.Client
+import io.appwrite.services.Account
+import io.appwrite.services.Databases
 import javax.inject.Singleton
 
 @Module
@@ -15,5 +17,17 @@ object AppwriteModule {
     @Singleton
     fun provideAppwriteClient(): Client {
         return AppwriteClient.client
+    }
+    
+    @Provides
+    @Singleton
+    fun provideAppwriteAccount(): Account {
+        return Account(AppwriteClient.client)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideAppwriteDatabase(): Databases {
+        return Databases(AppwriteClient.client)
     }
 }
