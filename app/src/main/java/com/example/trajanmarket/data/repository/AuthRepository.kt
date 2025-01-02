@@ -35,7 +35,7 @@ class AuthRepository(
     private val appwriteAccount: Account
 ) {
     
-    private fun getLoggedIn() = flow<State<User<Map<String, Any>>?>> {
+     fun getLoggedIn() = flow<State<User<Map<String, Any>>?>> {
         try {
             val user = appwriteAccount.get()
             emit(State.Succes(user))
