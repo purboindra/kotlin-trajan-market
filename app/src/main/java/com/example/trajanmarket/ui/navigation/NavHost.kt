@@ -27,8 +27,17 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             composable<Login> {
                 LoginScreen(navHostController = navController)
             }
-            composable<Main> {
-                MainScreen(navHostController = navController)
+            composable(route = "main?bottomNavbarIndex={bottomNavbarIndex}",
+                arguments = listOf(
+                    navArgument("bottomNavbarIndex") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val bottomNavbar = backStackEntry.arguments?.getString("bottomNavbarIndex")?:"-1"
+                MainScreen(navHostController = navController, bottomNavbar = bottomNavbar.toInt())
             }
             composable<Profile> {
                 ProfileScreen(navHostController = navController)
@@ -39,7 +48,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             ) { backStackEntry ->
                 val productId = backStackEntry.arguments?.getString("productId")
                 productId?.let {
-                    ProductDetailScreen(id = it)
+                    ProductDetailScreen(id = it, navHostController = navController)
                 }
             }
         }

@@ -89,7 +89,7 @@ fun LoginScreen(
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occured")
             }
         } else if (loginState is State.Succes) {
-            navHostController.navigate(route = Main)
+            navHostController.navigate(route = "main")
         }
     }
     

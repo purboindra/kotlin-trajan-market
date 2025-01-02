@@ -1,11 +1,13 @@
+@file:Suppress("INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING")
+
 package com.example.trajanmarket.ui.screens.product.detail
 
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +39,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -55,13 +56,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.ui.components.PriceContainerCompose
 import com.example.trajanmarket.ui.components.ReturnPolicyCompose
 import com.example.trajanmarket.ui.components.ReusableAsyncImageWithLoading
+import com.example.trajanmarket.ui.screens.cart.CartViewModel
 import com.example.trajanmarket.ui.screens.product.ProductViewModel
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.gray1
@@ -76,12 +78,16 @@ import androidx.compose.material.icons.Icons as Icons1
 @Composable
 fun ProductDetailScreen(
     productViewModel: ProductViewModel = hiltViewModel(),
-    id: String
+    cartViewModel: CartViewModel = hiltViewModel(),
+    navHostController: NavHostController,
+    id: String,
 ) {
-    
     val productByIdState by productViewModel.productByIdState.collectAsState()
     val price by productViewModel.price.collectAsState()
-    val addToCartState by productViewModel.addToCartState.collectAsState()
+    val hasProductInCart by productViewModel.hasProductInCart.collectAsState()
+    val addToCartState by cartViewModel.addToCartState.collectAsState()
+    val cartLocalListState by cartViewModel.cartLocalListState.collectAsState()
+    val removeFromCartState by cartViewModel.removeFromCartState.collectAsState()
     
     val coroutineScope = rememberCoroutineScope()
     
@@ -93,10 +99,11 @@ fun ProductDetailScreen(
     
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
+        cartViewModel.getLocalCarts()
+        productViewModel.checkProductInCart(id)
     }
     
     LaunchedEffect(addToCartState) {
-        
         when (addToCartState) {
             is State.Failure -> {
                 val throwable = (addToCartState as State.Failure).throwable
@@ -104,13 +111,33 @@ fun ProductDetailScreen(
             }
             
             is State.Succes -> {
-                snackbarHostState.showSnackbar("Success add to cart!")
+                cartViewModel.getLocalCarts()
+                productViewModel.checkProductInCart(id)
                 snackbarColor = green
+                snackbarHostState.showSnackbar("Success add to cart!")
             }
             
             else -> {}
         }
-        
+    }
+    
+    LaunchedEffect(removeFromCartState) {
+        when (removeFromCartState) {
+            is State.Failure -> {
+                val throwable = (removeFromCartState as State.Failure).throwable
+                snackbarColor = Color.Red
+                snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
+            }
+            
+            is State.Succes -> {
+                cartViewModel.getLocalCarts()
+                productViewModel.checkProductInCart(id)
+                snackbarColor = green
+                snackbarHostState.showSnackbar("Success remove from cart!")
+            }
+            
+            else -> {}
+        }
     }
     
     Scaffold(
@@ -133,7 +160,10 @@ fun ProductDetailScreen(
                     Box(
                         modifier = Modifier
                             .height(48.dp)
-                            .width(48.dp),
+                            .width(48.dp)
+                            .clickable {
+                                navHostController.navigate(route = "main?bottomNavbarIndex=2")
+                            },
                     ) {
                         Icon(
                             Icons1.Outlined.ShoppingCart,
@@ -147,8 +177,17 @@ fun ProductDetailScreen(
                                 .background(Color.Black)
                                 .align(Alignment.BottomEnd)
                         ) {
-                            Text(
-                                "1",
+                            if (cartLocalListState is State.Loading) Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = grayLight,
+                                    strokeWidth = 3.dp
+                                )
+                            } else Text(
+                                "${(cartLocalListState as? State.Succes)?.data?.size}",
                                 modifier = Modifier.align(Alignment.Center),
                                 fontWeight = FontWeight.W500,
                                 color = Color.White,
@@ -166,23 +205,29 @@ fun ProductDetailScreen(
                 ),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = blue100,
+                    disabledContainerColor = gray1,
                 ),
-                enabled = addToCartState !is State.Loading,
+                enabled = addToCartState !is State.Loading &&
+                        removeFromCartState !is State.Loading &&
+                        cartLocalListState !is State.Loading,
                 onClick = {
-                    Log.d("onTappp", "add to cart")
                     coroutineScope.launch {
-                        productViewModel.addToCart(
-                            listOf(
-                                AddToCartParams(
-                                    id = "1",
-                                    quantity = 1
+                        if (!hasProductInCart) {
+                            cartViewModel.addToCart(
+                                listOf(
+                                    AddToCartParams(
+                                        id = id,
+                                        quantity = 1
+                                    )
                                 )
                             )
-                        )
+                        } else {
+                            cartViewModel.removeFromCart(id)
+                        }
                     }
                 }
             ) {
-                if (addToCartState is State.Loading) {
+                if (addToCartState is State.Loading || removeFromCartState is State.Loading || cartLocalListState is State.Loading) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
@@ -195,7 +240,8 @@ fun ProductDetailScreen(
                     }
                 } else {
                     Text(
-                        "+ Keranjang", style = MaterialTheme.typography.titleSmall.copy(
+                        if (hasProductInCart) "Remove" else "+ Keranjang",
+                        style = MaterialTheme.typography.titleSmall.copy(
                             color = Color.White,
                         )
                     )

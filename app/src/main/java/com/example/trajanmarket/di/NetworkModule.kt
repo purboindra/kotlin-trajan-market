@@ -1,5 +1,6 @@
 package com.example.trajanmarket.di
 
+import com.example.trajanmarket.data.local.CartDao
 import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.remote.api.AuthApi
 import com.example.trajanmarket.data.remote.api.CartApi
@@ -36,8 +37,13 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideCartRepository(api: CartApi, userPreferences: UserPreferences) =
-        CartRepository(api, userPreferences)
+    fun provideCartRepository(
+        api: CartApi,
+        productApi: ProductApi,
+        userPreferences: UserPreferences,
+        cartDao: CartDao
+    ) =
+        CartRepository(api, productApi, userPreferences, cartDao)
     
     // AUTH
     @Provides
