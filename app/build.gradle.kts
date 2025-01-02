@@ -26,16 +26,6 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", "\"https://dummyjson.com/\"")
-            buildConfigField(
-                "String",
-                "API_KEY",
-                "\"${project.findProperty("API_KEY".toString())}\""
-            )
-            buildConfigField(
-                "String",
-                "PROJECT_ID",
-                "\"${project.findProperty("PROJECT_ID".toString())}\""
-            )
         }
         release {
             isMinifyEnabled = false
@@ -44,19 +34,7 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "BASE_URL", "\"https://dummyjson.com/\"")
-            
-            buildConfigField(
-                "String",
-                "API_KEY",
-                "\"${project.findProperty("API_KEY")}\""
-            )
-            buildConfigField(
-                "String",
-                "PROJECT_ID",
-                "\"${project.findProperty("PROJECT_ID")}\""
-            )
         }
-        
     }
     
     compileOptions {
@@ -124,9 +102,6 @@ dependencies {
     implementation(libs.datastore)
     
     implementation(libs.compose.shimmeer)
-    
-    // APPWRITE SDK
-    implementation("io.appwrite:sdk-for-kotlin:5.0.1")
     
 }
 
