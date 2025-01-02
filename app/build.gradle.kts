@@ -103,6 +103,9 @@ dependencies {
     
     implementation(libs.compose.shimmeer)
     
+    // APPWRITE
+    implementation("io.appwrite:sdk-for-kotlin:5.0.1")
+    
 }
 
 hilt {
