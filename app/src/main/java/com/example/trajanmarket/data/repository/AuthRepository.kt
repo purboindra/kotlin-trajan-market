@@ -29,8 +29,6 @@ data class ErrorResponse(val message: String)
 private val TAG = "AuthRepository"
 
 class AuthRepository(
-    private val userPreferences: UserPreferences,
-    private val authApi: AuthApi,
     private val appwriteDatabase: Databases,
     private val appwriteAccount: Account
 ) {
