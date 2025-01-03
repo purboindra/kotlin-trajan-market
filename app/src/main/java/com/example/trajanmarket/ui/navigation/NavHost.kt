@@ -13,6 +13,7 @@ import com.example.trajanmarket.ui.screens.login.LoginScreen
 import com.example.trajanmarket.ui.screens.main.MainScreen
 import com.example.trajanmarket.ui.screens.product.detail.ProductDetailScreen
 import com.example.trajanmarket.ui.screens.profile.ProfileScreen
+import com.example.trajanmarket.ui.screens.register.RegisterScreen
 import com.example.trajanmarket.ui.screens.splash.SplashScreen
 
 @Composable
@@ -27,6 +28,9 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             composable<Login> {
                 LoginScreen(navHostController = navController)
             }
+            composable<Register> {
+                RegisterScreen(navHostController = navController)
+            }
             composable(route = "main?bottomNavbarIndex={bottomNavbarIndex}",
                 arguments = listOf(
                     navArgument("bottomNavbarIndex") {
@@ -36,7 +40,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                     }
                 )
             ) { backStackEntry ->
-                val bottomNavbar = backStackEntry.arguments?.getString("bottomNavbarIndex")?:"-1"
+                val bottomNavbar = backStackEntry.arguments?.getString("bottomNavbarIndex") ?: "-1"
                 MainScreen(navHostController = navController, bottomNavbar = bottomNavbar.toInt())
             }
             composable<Profile> {

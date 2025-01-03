@@ -1,4 +1,4 @@
-package com.example.trajanmarket.ui.screens.login
+package com.example.trajanmarket.ui.screens.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,7 +23,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -41,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,16 +53,18 @@ import androidx.navigation.NavHostController
 import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.TextFieldCompose
-import com.example.trajanmarket.ui.navigation.Main
+import com.example.trajanmarket.ui.navigation.Login
 import com.example.trajanmarket.ui.navigation.Register
+import com.example.trajanmarket.ui.screens.login.LoginViewModel
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.ui.theme.yellow80
 import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
 
+
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     loginViewModel: LoginViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
@@ -88,7 +88,7 @@ fun LoginScreen(
         if (loginState is State.Failure) {
             val throwable: Throwable = (loginState as State.Failure).throwable
             scope.launch {
-                snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occured")
+                snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
             }
         } else if (loginState is State.Succes) {
             navHostController.navigate(route = "main")
@@ -96,8 +96,8 @@ fun LoginScreen(
     }
 
     val annotatedText = buildAnnotatedString {
-        append("Don't have an account?")
-        pushStringAnnotation(tag = "SIGN_UP", annotation = "sign_up")
+        append("Have an account?")
+        pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
         withStyle(
             style = SpanStyle(
                 color = Color.Black,
@@ -105,7 +105,7 @@ fun LoginScreen(
                 fontWeight = FontWeight.W500,
             )
         ) {
-            append(" Sign Up")
+            append(" Sign In")
         }
         pop()
     }
@@ -163,7 +163,7 @@ fun LoginScreen(
                         }
                     } else {
                         Text(
-                            text = "Log In",
+                            text = "Register",
                             color = Color.White
                         )
                     }
@@ -172,7 +172,7 @@ fun LoginScreen(
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     BasicText(annotatedText,
                         modifier = Modifier.clickable {
-                            navHostController.navigate(Register)
+                            navHostController.navigate(Login)
                         },
                         onTextLayout = { textLayoutResult ->
                             // You can add logic here to calculate offsets if needed
@@ -200,7 +200,7 @@ fun LoginScreen(
                         disabledContentColor = blue100
                     )
                 ) {
-                    Text("Log In With Google", color = Color.White)
+                    Text("Register With Google", color = Color.White)
                 }
             }
         }
@@ -212,9 +212,9 @@ fun LoginScreen(
             item {
                 Text("Hello ${userNamePref ?: ""}", fontSize = 20.sp, fontWeight = FontWeight.W700)
                 18.VerticalSpacer()
-                Text("Let’s Sign You In", fontSize = 20.sp, fontWeight = FontWeight.W700)
+                Text("Let’s Sign You Up", fontSize = 20.sp, fontWeight = FontWeight.W700)
                 Text(
-                    "Welcome back, you’ve been missed!", fontSize = 16.sp,
+                    "Welcome to Trajan Market App", fontSize = 16.sp,
                     fontWeight = FontWeight.W500,
                     color = Color.DarkGray
                 )
