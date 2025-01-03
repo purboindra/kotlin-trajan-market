@@ -66,8 +66,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun RegisterScreen(
     loginViewModel: LoginViewModel = hiltViewModel(),
-    navHostController: NavHostController
-) {
+    navHostController: NavHostController,
+
+    ) {
 
     val loginState by loginViewModel.loginState.collectAsState()
 
@@ -78,6 +79,7 @@ fun RegisterScreen(
     val hasShowPassword by loginViewModel.showPassword.collectAsState()
     val userNameError by loginViewModel.userNameError.collectAsState()
     val passwordError by loginViewModel.passwordError.collectAsState()
+    val address by loginViewModel.address.collectAsState()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -277,6 +279,28 @@ fun RegisterScreen(
                     },
                     visualTransformation = if (hasShowPassword) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                )
+                10.VerticalSpacer()
+                TextFieldCompose(
+                    value = address,
+                    onValueChanged = {
+                        loginViewModel.onUserNameChange(it)
+                    },
+                    isError = userNameError != null,
+                    label = {
+                        Text(text = "Your Address", color = Color.Gray)
+                    },
+                    prefix = {
+                        Icon(
+                            Icons.Rounded.Person,
+                            contentDescription = "Username",
+                            tint = Color.Gray
+                        )
+                    },
+                    enabled = false,
+                    onClick = {
+                        loginViewModel.setAddress()
+                    }
                 )
 
                 if (passwordError != null)

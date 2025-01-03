@@ -1,5 +1,6 @@
 package com.example.trajanmarket.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,10 +26,17 @@ fun TextFieldCompose(
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    enabled: Boolean = false,
+    readOnly: Boolean = false,
+    onClick: (() -> Unit)? = null,
 ) {
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = onClick != null) {
+                onClick?.invoke()
+            },
         value = value,
         onValueChange = onValueChanged,
         isError = isError ?: false,
@@ -39,5 +47,7 @@ fun TextFieldCompose(
         suffix = suffix,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
+        enabled = enabled,
+        readOnly = readOnly,
     )
 }
