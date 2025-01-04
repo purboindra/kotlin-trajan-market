@@ -1,5 +1,9 @@
 package com.example.trajanmarket.ui.screens.register
 
+import android.Manifest
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +22,8 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.rounded.Contacts
+import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -54,49 +61,81 @@ import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.TextFieldCompose
 import com.example.trajanmarket.ui.navigation.Login
-import com.example.trajanmarket.ui.navigation.Register
-import com.example.trajanmarket.ui.screens.login.LoginViewModel
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.ui.theme.yellow80
+import com.example.trajanmarket.utils.LocationHelper
 import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun RegisterScreen(
-    loginViewModel: LoginViewModel = hiltViewModel(),
+    registerViewModel: RegisterViewModel = hiltViewModel(),
     navHostController: NavHostController,
-
-    ) {
-
-    val loginState by loginViewModel.loginState.collectAsState()
-
-    val userNamePref by loginViewModel.userNamePref.collectAsState(initial = null)
-
-    val userName by loginViewModel.userName.collectAsState()
-    val password by loginViewModel.password.collectAsState()
-    val hasShowPassword by loginViewModel.showPassword.collectAsState()
-    val userNameError by loginViewModel.userNameError.collectAsState()
-    val passwordError by loginViewModel.passwordError.collectAsState()
-    val address by loginViewModel.address.collectAsState()
-
+) {
+    
+    val registerState by registerViewModel.registerState.collectAsState()
+    
+    val context = LocalContext.current
+    
+    val userName by registerViewModel.userName.collectAsState()
+    val password by registerViewModel.password.collectAsState()
+    val hasShowPassword by registerViewModel.showPassword.collectAsState()
+    val userNameError by registerViewModel.userNameError.collectAsState()
+    val passwordError by registerViewModel.passwordError.collectAsState()
+    val address by registerViewModel.address.collectAsState()
+    val email by registerViewModel.email.collectAsState()
+    val phoneNumber by registerViewModel.phoneNumber.collectAsState()
+    val phoneNumberError by registerViewModel.phoneNumberError.collectAsState()
+    val emailError by registerViewModel.emailError.collectAsState()
+    
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
+    
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(loginState) {
-        if (loginState is State.Failure) {
-            val throwable: Throwable = (loginState as State.Failure).throwable
+    
+    val activity = LocalContext.current as? Activity
+    
+    val locationHelper = remember { LocationHelper(context) }
+    
+    val requestLocationPermissions =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val hasFineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            if (hasFineLocation) {
+                println("Location permission granted")
+            } else {
+                println("Location permission denied")
+                scope.launch {
+                    snackbarHostState.showSnackbar("Location permission denied")
+                }
+                activity?.let {
+                    locationHelper.requestPermission(it)
+                }
+            }
+        }
+    
+    LaunchedEffect(Unit) {
+        println("Requesting location permission")
+        locationHelper.setPermissionLauncher(requestLocationPermissions)
+        locationHelper.requestLocationPermission(
+            activity = activity!!,
+            locationPermissionLauncher = requestLocationPermissions
+        )
+    }
+    
+    
+    LaunchedEffect(registerState) {
+        if (registerState is State.Failure) {
+            val throwable: Throwable = (registerState as State.Failure).throwable
             scope.launch {
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
             }
-        } else if (loginState is State.Succes) {
+        } else if (registerState is State.Succes) {
             navHostController.navigate(route = "main")
         }
     }
-
+    
     val annotatedText = buildAnnotatedString {
         append("Have an account?")
         pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
@@ -111,7 +150,7 @@ fun RegisterScreen(
         }
         pop()
     }
-
+    
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
@@ -130,17 +169,17 @@ fun RegisterScreen(
                         .height(48.dp),
                     onClick = {
                         if (userName.isBlank()) {
-                            loginViewModel.onUserNameErrorChange("Username cannot be empty!")
+                            registerViewModel.onUserNameErrorChange("Username cannot be empty!")
                         }
-
+                        
                         if (password.isBlank()) {
-                            loginViewModel.onPasswordErrorChange("Password cannot be empty!")
+                            registerViewModel.onPasswordErrorChange("Password cannot be empty!")
                             return@ElevatedButton
                         }
-
+                        
                         if (passwordError == null && userNameError == null) {
                             keyboardController?.hide()
-                            loginViewModel.login(userName, password)
+                            registerViewModel.register()
                         }
                     },
                     shape = RoundedCornerShape(8.dp),
@@ -151,7 +190,7 @@ fun RegisterScreen(
                         disabledContentColor = yellow80
                     )
                 ) {
-                    if (loginState is State.Loading) {
+                    if (registerState is State.Loading) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -212,7 +251,7 @@ fun RegisterScreen(
                 .padding(paddingValues)
         ) {
             item {
-                Text("Hello ${userNamePref ?: ""}", fontSize = 20.sp, fontWeight = FontWeight.W700)
+                Text("Hello", fontSize = 20.sp, fontWeight = FontWeight.W700)
                 18.VerticalSpacer()
                 Text("Let’s Sign You Up", fontSize = 20.sp, fontWeight = FontWeight.W700)
                 Text(
@@ -224,7 +263,7 @@ fun RegisterScreen(
                 TextFieldCompose(
                     value = userName,
                     onValueChanged = {
-                        loginViewModel.onUserNameChange(it)
+                        registerViewModel.onUserNameChange(it)
                     },
                     isError = userNameError != null,
                     label = {
@@ -247,9 +286,34 @@ fun RegisterScreen(
                     )
                 10.VerticalSpacer()
                 TextFieldCompose(
+                    value = email,
+                    onValueChanged = {
+                        registerViewModel.onEmailChange(it)
+                    },
+                    isError = emailError != null,
+                    label = {
+                        Text(text = "Email", color = Color.Gray)
+                    },
+                    prefix = {
+                        Icon(
+                            Icons.Rounded.Email,
+                            contentDescription = "Email",
+                            tint = Color.Gray
+                        )
+                    }
+                )
+                if (emailError != null)
+                    Text(
+                        text = emailError ?: "",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                10.VerticalSpacer()
+                TextFieldCompose(
                     value = password,
                     onValueChanged = {
-                        loginViewModel.onPasswordChange(it)
+                        registerViewModel.onPasswordChange(it)
                     },
                     isError = passwordError != null,
                     label = {
@@ -267,7 +331,7 @@ fun RegisterScreen(
                             Modifier
                                 .padding(end = 0.dp)
                                 .clickable {
-                                    loginViewModel.toggleShowPassword()
+                                    registerViewModel.toggleShowPassword()
                                 }
                         ) {
                             Icon(
@@ -282,9 +346,34 @@ fun RegisterScreen(
                 )
                 10.VerticalSpacer()
                 TextFieldCompose(
+                    value = phoneNumber,
+                    onValueChanged = {
+                        registerViewModel.onPhoneNumberError(it)
+                    },
+                    isError = phoneNumberError != null,
+                    label = {
+                        Text(text = "Phone Number", color = Color.Gray)
+                    },
+                    prefix = {
+                        Icon(
+                            Icons.Rounded.Contacts,
+                            contentDescription = "Phone Number",
+                            tint = Color.Gray
+                        )
+                    }
+                )
+                if (phoneNumberError != null)
+                    Text(
+                        text = phoneNumberError ?: "",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                10.VerticalSpacer()
+                TextFieldCompose(
                     value = address,
                     onValueChanged = {
-                        loginViewModel.onUserNameChange(it)
+                        registerViewModel.onUserNameChange(it)
                     },
                     isError = userNameError != null,
                     label = {
@@ -297,12 +386,21 @@ fun RegisterScreen(
                             tint = Color.Gray
                         )
                     },
+                    readOnly = true,
                     enabled = false,
                     onClick = {
-                        loginViewModel.setAddress()
+                        if (activity != null) {
+                            locationHelper.requestLocationPermission(
+                                activity,
+                                requestLocationPermissions
+                            )
+                            
+                            registerViewModel.setAddress()
+                        } else {
+                            println("Activity is null")
+                        }
                     }
                 )
-
                 if (passwordError != null)
                     Text(
                         text = passwordError ?: "",

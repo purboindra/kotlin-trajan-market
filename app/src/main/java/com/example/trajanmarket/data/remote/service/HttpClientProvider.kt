@@ -95,7 +95,7 @@ object HttpClientProvider {
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
                 url {
                     protocol = URLProtocol.HTTPS
-                    url("")
+                    url(BuildConfig.BASE_URL)
                 }
             }
         }

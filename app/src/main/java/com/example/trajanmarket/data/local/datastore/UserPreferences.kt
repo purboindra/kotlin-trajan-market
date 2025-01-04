@@ -23,6 +23,12 @@ class UserPreferences(private val context: Context) {
         }
     }
     
+    suspend fun saveUserEmail(email: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKey.USER_EMAIL] = email
+        }
+    }
+    
     suspend fun saveUserName(userName: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.USER_NAME] = userName
@@ -59,6 +65,10 @@ class UserPreferences(private val context: Context) {
     
     val userId: Flow<String?> = context.dataStore.data.map { preferences ->
         preferences[PreferencesKey.USER_ID]
+    }
+    
+    val email: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKey.USER_EMAIL]
     }
     
     val isLoggedIn: Flow<Boolean> = context.dataStore.data.map { preferences ->

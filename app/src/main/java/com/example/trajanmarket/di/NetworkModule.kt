@@ -26,19 +26,19 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpClient(): HttpClient = HttpClientProvider.client
-
+    
     @Provides
     @Singleton
     fun provideProductApi(client: HttpClient): ProductApi = ProductApi(client)
-
+    
     @Provides
     @Singleton
     fun provideCartApi(client: HttpClient): CartApi = CartApi(client)
-
+    
     @Provides
     @Singleton
     fun provideProductRepository(api: ProductApi) = ProductRepository(api)
-
+    
     @Provides
     @Singleton
     fun provideCartRepository(
@@ -48,14 +48,18 @@ object NetworkModule {
         cartDao: CartDao
     ) =
         CartRepository(api, productApi, userPreferences, cartDao)
-
+    
     // AUTH
     @Provides
     @Singleton
     fun provideAuthApi(client: HttpClient): AuthApi = AuthApi(client)
-
+    
     @Provides
     @Singleton
-    fun provideAuthRepository(database: Databases, account: Account): AuthRepository =
-        AuthRepository(database, account)
+    fun provideAuthRepository(
+        database: Databases,
+        account: Account,
+        userPreferences: UserPreferences
+    ): AuthRepository =
+        AuthRepository(database, account, userPreferences)
 }

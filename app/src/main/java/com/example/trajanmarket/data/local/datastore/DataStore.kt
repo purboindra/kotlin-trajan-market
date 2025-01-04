@@ -11,6 +11,7 @@ object PreferencesKey {
     val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     val USER_IMAGE = stringPreferencesKey("user_image")
     val ACCESS_TOKEN = stringPreferencesKey("access_token")
+    val USER_EMAIL = stringPreferencesKey("email")
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")

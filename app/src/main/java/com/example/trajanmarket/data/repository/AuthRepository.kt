@@ -1,26 +1,29 @@
 package com.example.trajanmarket.data.repository
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.trajanmarket.data.local.datastore.UserPreferences
-import com.example.trajanmarket.data.model.LoginResponse
 import com.example.trajanmarket.data.model.State
-import com.example.trajanmarket.data.remote.api.AuthApi
-import com.example.trajanmarket.data.remote.service.ParsedClientException
+import com.example.trajanmarket.domain.appwrite.AppwriteClient
+import com.example.trajanmarket.utils.generateSalt
+import com.example.trajanmarket.utils.hashPasswordSHA256
+import io.appwrite.Client
 import io.appwrite.ID
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.User
 import io.appwrite.services.Account
 import io.appwrite.services.Databases
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 
 @Serializable
@@ -30,85 +33,100 @@ private val TAG = "AuthRepository"
 
 class AuthRepository(
     private val appwriteDatabase: Databases,
-    private val appwriteAccount: Account
+    private val appwriteAccount: Account,
+    private val userPreferences: UserPreferences,
 ) {
     
-     fun getLoggedIn() = flow<State<User<Map<String, Any>>?>> {
+    private val databaseId = AppwriteClient.DATABASE_ID
+    
+    private val collectionUsers = AppwriteClient.COLLECTION_USERS
+    private val collectionProducts = AppwriteClient.COLLECTION_PRODUCTS
+    private val collectionCarts = AppwriteClient.COLLECTION_CARTS
+    
+    fun getLoggedIn() = flow<State<User<Map<String, Any>>?>> {
         try {
             val user = appwriteAccount.get()
+            Log.d(TAG, "Logged in user: $user")
             emit(State.Succes(user))
         } catch (e: AppwriteException) {
-            Log.d(TAG, "Error getting logged in user: ${e.message}")
+            Log.d(TAG, "Error get logged in user: ${e.message}")
+            emit(State.Failure(e))
+        }
+    }
+    
+    fun login(email: String, password: String): Flow<State<Boolean>> = flow {
+        emit(State.Loading)
+        Log.d(TAG, "Logging in user: $email $password")
+        
+        try {
+            val session =
+                appwriteAccount.createEmailPasswordSession(email = email, password = password)
+            Log.d(TAG, "Login session: $session")
+            emit(State.Succes(true))
+        } catch (e: Exception) {
+            Log.d(TAG, "Error during login: ${e.message}")
             emit(State.Failure(e))
         }
     }
     
     
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun login(email: String, password: String): Flow<State<User<Map<String, Any>>?>> = flow {
-        emit(State.Loading)
-        appwriteAccount.createEmailPasswordSession(email, password)
-    }.flatMapConcat {
-        getLoggedIn()
-    }.catch { e ->
-        Log.d(TAG, "Error getting logged in user: ${e.message}")
-        emit(State.Failure(e))
-    }
-    
-    
-    fun register(username: String, password: String, email: String, phoneNumber: String) =
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun register(
+        username: String,
+        password: String,
+        email: String,
+        phoneNumber: String,
+        address: String
+    ) =
         flow {
             emit(State.Loading)
+            
             try {
-                val userFlow = try {
-                    appwriteAccount.create(ID.unique(), email, password)
-                    login(email, password)
+                val user = try {
+                    appwriteAccount.create(ID.unique(), email, password, name = username)
                 } catch (e: Exception) {
                     Log.d(TAG, "Error creating user: ${e.message}")
                     emit(State.Failure(e))
                     return@flow
                 }
                 
-                userFlow.collect { state ->
-                    when (state) {
-                        is State.Succes -> {
-                            val user = state.data
-                            val userId = user?.id
-                            val userDocument = mapOf(
-                                "userId" to userId,
-                                "username" to username,
-                                "email" to email,
-                                "phoneNumber" to phoneNumber
-                            )
-                            try {
-                                appwriteDatabase.createDocument(
-                                    collectionId = "616f3b3b7f5b4",
-                                    data = userDocument,
-                                    databaseId = "your_database_id",
-                                    documentId = ID.unique(),
-                                    permissions = listOf()          // Replace TODO() with appropriate permissions
-                                )
-                                emit(State.Succes(true)) // Successfully created the user and the document
-                            } catch (e: Exception) {
-                                Log.d(TAG, "Error creating user document: ${e.message}")
-                                emit(State.Failure(e)) // Handle document creation failure
-                            }
-                        }
-                        
-                        is State.Failure -> {
-                            emit(State.Failure(state.throwable)) // Propagate the error state
-                        }
-                        
-                        else -> {
-                            emit(State.Loading) // Emit loading state if necessary
-                        }
-                    }
-                }
+                login(email, password)
+                
+                val date = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                
+                val userId = user.id
+                
+                val salt = generateSalt()
+                val hashedPassword = hashPasswordSHA256(password, salt)
+                
+                val userDocument = mapOf(
+                    "id" to userId,
+                    "username" to username,
+                    "full_name" to username,
+                    "password" to hashedPassword,
+                    "email" to email,
+                    "phone_number" to phoneNumber,
+                    "address" to address,
+                    "created_at" to date,
+                )
+                
+                appwriteDatabase.createDocument(
+                    collectionId = collectionUsers,
+                    data = userDocument,
+                    databaseId = databaseId,
+                    documentId = userId,
+                    permissions = listOf()
+                )
+                
+                userPreferences.saveUserId(userId)
+                userPreferences.saveUserName(username)
+                userPreferences.saveUserEmail(email)
+                
+                emit(State.Succes(true))
             } catch (e: Exception) {
                 Log.d(TAG, "Error registering user: ${e.message}")
-                emit(State.Failure(e)) // Catch any remaining errors
+                emit(State.Failure(e))
             }
-            
         }
 
 //    fun login(username: String, password: String): Flow<State<LoginResponse>> = flow {

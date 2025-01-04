@@ -12,30 +12,55 @@ plugins {
 android {
     namespace = "com.example.trajanmarket"
     compileSdk = 35
-
+    
     defaultConfig {
         applicationId = "com.example.trajanmarket"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    
     buildTypes {
         debug {
             buildConfigField(
                 "String",
+                "BASE_URL",
+                "\"${project.findProperty("BASE_URL")}\""
+            )
+            buildConfigField(
+                "String",
                 "API_KEY",
-                "\"${project.findProperty("API_KEY".toString())}\""
+                "\"${project.findProperty("API_KEY")}\""
             )
             buildConfigField(
                 "String",
                 "PROJECT_ID",
-                "\"${project.findProperty("PROJECT_ID".toString())}\""
+                "\"${project.findProperty("PROJECT_ID")}\""
             )
-
+            buildConfigField(
+                "String",
+                "DATABASE_ID",
+                "\"${project.findProperty("DATABASE_ID")}\""
+            )
+            // COLLECTIONS
+            buildConfigField(
+                "String",
+                "COLLECTION_USERS",
+                "\"${project.findProperty("COLLECTION_USERS")}\""
+            )
+            buildConfigField(
+                "String",
+                "COLLECTION_CARTS",
+                "\"${project.findProperty("COLLECTION_CARTS")}\""
+            )
+            buildConfigField(
+                "String",
+                "COLLECTION_PRODUCTS",
+                "\"${project.findProperty("COLLECTION_PRODUCTS")}\""
+            )
         }
         release {
             isMinifyEnabled = false
@@ -45,17 +70,43 @@ android {
             )
             buildConfigField(
                 "String",
+                "BASE_URL",
+                "\"${project.findProperty("BASE_URL")}\""
+            )
+            buildConfigField(
+                "String",
                 "API_KEY",
-                "\"${project.findProperty("API_KEY".toString())}\""
+                "\"${project.findProperty("API_KEY")}\""
             )
             buildConfigField(
                 "String",
                 "PROJECT_ID",
-                "\"${project.findProperty("PROJECT_ID".toString())}\""
+                "\"${project.findProperty("PROJECT_ID")}\""
+            )
+            buildConfigField(
+                "String",
+                "DATABASE_ID",
+                "\"${project.findProperty("DATABASE_ID")}\""
+            )
+            // COLLECTIONS
+            buildConfigField(
+                "String",
+                "COLLECTION_USERS",
+                "\"${project.findProperty("COLLECTION_USERS")}\""
+            )
+            buildConfigField(
+                "String",
+                "COLLECTION_CARTS",
+                "\"${project.findProperty("COLLECTION_CARTS")}\""
+            )
+            buildConfigField(
+                "String",
+                "COLLECTION_PRODUCTS",
+                "\"${project.findProperty("COLLECTION_PRODUCTS")}\""
             )
         }
     }
-
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -70,7 +121,7 @@ android {
 }
 
 dependencies {
-
+    
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -89,17 +140,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
-
+    
     // HILT
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
-
+    
     // NAVIGATION
     implementation(libs.navigation.compose)
     implementation(libs.navigation.ui)
     implementation(libs.navigation.fragment)
-
+    
     // KTOR
     implementation(libs.ktor.cio)
     implementation(libs.ktor.core)
@@ -107,28 +158,28 @@ dependencies {
     implementation(libs.ktor.client.serialization)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
-
+    
     // COIL
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-
+    
     // ROOM
     implementation(libs.room.runtime)
     kapt(libs.room.compiler)
     implementation(libs.room.ktx)
-
+    
     // DATASTORE
     implementation(libs.datastore.preferences)
     implementation(libs.datastore)
-
+    
     implementation(libs.compose.shimmeer)
-
+    
     // APPWRITE
     implementation("io.appwrite:sdk-for-kotlin:5.0.1")
-
+    
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
-
-
+    
+    
 }
 
 hilt {
