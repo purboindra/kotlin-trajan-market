@@ -56,19 +56,28 @@ class AuthRepository(
     
     fun login(email: String, password: String): Flow<State<Boolean>> = flow {
         emit(State.Loading)
-        Log.d(TAG, "Logging in user: $email $password")
-        
         try {
             val session =
                 appwriteAccount.createEmailPasswordSession(email = email, password = password)
-            Log.d(TAG, "Login session: $session")
+            
+            val user = appwriteDatabase.getDocument(
+                databaseId,
+                collectionUsers,
+                session.userId
+            )
+            
+            Log.d(TAG, "Logged in user: $user")
+            
+            userPreferences.saveUserId(user.data["id"] as String)
+            userPreferences.saveUserName(user.data["username"] as String)
+            userPreferences.saveUserEmail(user.data["email"] as String)
+            
             emit(State.Succes(true))
         } catch (e: Exception) {
             Log.d(TAG, "Error during login: ${e.message}")
             emit(State.Failure(e))
         }
     }
-    
     
     @RequiresApi(Build.VERSION_CODES.O)
     fun register(
@@ -90,8 +99,6 @@ class AuthRepository(
                     return@flow
                 }
                 
-                login(email, password)
-                
                 val date = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                 
                 val userId = user.id
@@ -108,6 +115,8 @@ class AuthRepository(
                     "phone_number" to phoneNumber,
                     "address" to address,
                     "created_at" to date,
+                    "email_verification" to user.emailVerification,
+                    "phone_verification" to user.phoneVerification,
                 )
                 
                 appwriteDatabase.createDocument(
@@ -118,9 +127,7 @@ class AuthRepository(
                     permissions = listOf()
                 )
                 
-                userPreferences.saveUserId(userId)
-                userPreferences.saveUserName(username)
-                userPreferences.saveUserEmail(email)
+                login(email, password)
                 
                 emit(State.Succes(true))
             } catch (e: Exception) {
@@ -128,38 +135,16 @@ class AuthRepository(
                 emit(State.Failure(e))
             }
         }
-
-//    fun login(username: String, password: String): Flow<State<LoginResponse>> = flow {
-//        emit(State.Loading)
-//        try {
-//            val response = authApi.login(username, password)
-//            if (response.status.isSuccess()) {
-//                val responseBody = response.bodyAsText()
-//                val loginResponse: LoginResponse =
-//                    Json.decodeFromString<LoginResponse>(responseBody)
-//                userPreferences.saveUserName(loginResponse.username)
-//                userPreferences.saveUserId(loginResponse.id.toString())
-//
-//
-//                emit(State.Succes(loginResponse))
-//            } else {
-//                val errorText = response.bodyAsText()
-//                val errorResponse = try {
-//                    Json.decodeFromString<ErrorResponse>(errorText)
-//                } catch (e: Exception) {
-//                    ErrorResponse(e.message ?: "Unknown error occurred")
-//                }
-//                emit(State.Failure(Exception(errorResponse.message)))
-//            }
-//        } catch (e: ParsedClientException) {
-//            Log.e("ParsedClientException AuthRepository", e.message)
-//            emit(State.Failure(Exception(e.message)))
-//        } catch (e: ClientRequestException) {
-//            Log.e("ClientRequestException AuthRepository", e.message)
-//            emit(State.Failure(Exception(e.message)))
-//        } catch (e: Exception) {
-//            Log.e("Exception AuthRepository", "Login: ${e.message}")
-//            emit(State.Failure(Exception("Network error: ${e.localizedMessage}")))
-//        }
-//    }
+    
+    fun logout() = flow {
+        emit(State.Loading)
+        try {
+            kotlinx.coroutines.delay(1000)
+            userPreferences.clear()
+            emit(State.Succes(true))
+        } catch (e: Exception) {
+            Log.d(TAG, "Error during logout: ${e.message}")
+            emit(State.Failure(e))
+        }
+    }
 }

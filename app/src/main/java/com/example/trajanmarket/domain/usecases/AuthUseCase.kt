@@ -26,4 +26,6 @@ class AuthUseCase @Inject constructor(
         address: String,
     ): Flow<State<Boolean>> =
         authRepository.register(username, password, email, phoneNumber, address)
+    
+    fun logout(): Flow<State<Boolean>> = authRepository.logout()
 }

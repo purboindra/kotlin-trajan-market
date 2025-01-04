@@ -1,7 +1,9 @@
 package com.example.trajanmarket.ui.screens.register
 
 import android.app.Activity
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trajanmarket.data.local.datastore.UserPreferences
@@ -105,6 +107,7 @@ class RegisterViewModel @Inject constructor(
         _phoneNumberError.update { if (value.isBlank()) "Phone number cannot be empty" else null }
     }
     
+    @RequiresApi(Build.VERSION_CODES.O)
     fun register() {
         viewModelScope.launch {
             authUseCase.register(
