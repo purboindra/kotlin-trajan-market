@@ -221,7 +221,8 @@ fun ProductDetailScreen(
                                     AddToCartParams(
                                         id = id,
                                         quantity = 1,
-                                        price=price
+                                        price = price,
+                                        name = (productByIdState as State.Succes).data.title
                                     )
                                 )
                             )

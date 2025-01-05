@@ -13,6 +13,7 @@ import com.example.trajanmarket.data.remote.api.CartApi
 import com.example.trajanmarket.data.remote.api.ProductApi
 import com.example.trajanmarket.domain.appwrite.AppwriteClient
 import io.appwrite.ID
+import io.appwrite.Query
 import io.appwrite.services.Databases
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
@@ -53,12 +54,24 @@ class CartRepository(
                 throw Exception("User ID not valid!")
             }
             
+            // TODO REMOVE THIS LOGIC
+            val productsAppwrite = appwriteDatabase.listDocuments(
+                databaseId,
+                AppwriteClient.COLLECTION_PRODUCTS,
+                listOf(
+                    Query.equal("name", products[0].name)
+                )
+            )
+            
+            val productId = productsAppwrite.documents[0].id
+            
+            // TODO GET PRODUCT ID FROM PARAMATER
             val dataCart = mapOf(
                 "id" to ID.unique(),
                 "quantity" to "1",
                 "created_at" to createdAt,
                 "price" to products[0].price.toString(),
-                "products" to products[0].id,
+                "products" to productId,
                 "users" to userId,
             )
             
@@ -76,6 +89,8 @@ class CartRepository(
             )
             
             cartDao.insert(cartEntity)
+            
+            emit(State.Succes(true))
             
         } catch (e: Throwable) {
             Log.d("error add to cart", e.message ?: "Unknown error")
