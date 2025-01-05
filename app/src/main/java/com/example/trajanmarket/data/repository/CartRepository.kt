@@ -84,7 +84,7 @@ class CartRepository(
             
             val cartEntity = CartEntity(
                 productId = products[0].id.toInt(),
-                userId = userId.toInt(),
+                userId = userId,
                 quantity = 1
             )
             
