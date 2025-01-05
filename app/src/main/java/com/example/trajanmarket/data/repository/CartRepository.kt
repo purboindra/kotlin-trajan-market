@@ -1,6 +1,8 @@
 package com.example.trajanmarket.data.repository
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.trajanmarket.data.local.CartDao
 import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.model.CartEntity
@@ -9,6 +11,9 @@ import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.data.remote.api.CartApi
 import com.example.trajanmarket.data.remote.api.ProductApi
+import com.example.trajanmarket.domain.appwrite.AppwriteClient
+import io.appwrite.ID
+import io.appwrite.services.Databases
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
@@ -20,24 +25,49 @@ import kotlinx.serialization.json.Json
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class CartRepository(
-    private val cartApi: CartApi,
+    private val appwriteDatabase: Databases,
     private val productApi: ProductApi,
     private val userPreferences: UserPreferences,
     private val cartDao: CartDao
 ) {
     
+    private val databaseId = AppwriteClient.DATABASE_ID
+    private val collectionCarts = AppwriteClient.COLLECTION_CARTS
+    
+    @RequiresApi(Build.VERSION_CODES.O)
     fun addToCart(products: List<AddToCartParams>): Flow<State<Boolean>> = flow {
         
-        Log.d("addToCart", "Add to cart called: $products")
-        
         emit(State.Loading)
+        
+        val createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        
+        val userId = userPreferences.userId.firstOrNull()
+        
         try {
-            val userId = userPreferences.userId.first() ?: throw Exception("User not valid")
             
-            val response = cartApi.addToCart(products, userId)
+            if (userId == null) {
+                throw Exception("User ID not valid!")
+            }
+            
+            val dataCart = mapOf(
+                "id" to ID.unique(),
+                "quantity" to "1",
+                "created_at" to createdAt,
+                "price" to products[0].price.toString(),
+                "products" to products[0].id,
+                "users" to userId,
+            )
+            
+            appwriteDatabase.createDocument(
+                databaseId,
+                collectionId = collectionCarts,
+                documentId = ID.unique(),
+                dataCart,
+            )
             
             val cartEntity = CartEntity(
                 productId = products[0].id.toInt(),
@@ -45,18 +75,8 @@ class CartRepository(
                 quantity = 1
             )
             
-            if (response.status.isSuccess()) {
-                cartDao.insert(cartEntity)
-                emit(State.Succes(true))
-            } else {
-                val errorText = response.bodyAsText()
-                val errorResponse = try {
-                    Json.decodeFromString<ErrorResponse>(errorText)
-                } catch (e: Throwable) {
-                    ErrorResponse(e.message ?: "Unknown error occurred")
-                }
-                emit(State.Failure(Exception(errorResponse.message)))
-            }
+            cartDao.insert(cartEntity)
+            
         } catch (e: Throwable) {
             Log.d("error add to cart", e.message ?: "Unknown error")
             emit(State.Failure(e))

@@ -11,7 +11,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AddToCartParams(
     val id: String,
-    val quantity: Int
+    val quantity: Int,
+    val price: Double
 )
 
 @Serializable

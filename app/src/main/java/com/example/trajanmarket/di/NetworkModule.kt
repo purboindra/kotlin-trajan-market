@@ -9,12 +9,10 @@ import com.example.trajanmarket.data.remote.service.HttpClientProvider
 import com.example.trajanmarket.data.repository.AuthRepository
 import com.example.trajanmarket.data.repository.CartRepository
 import com.example.trajanmarket.data.repository.ProductRepository
-import com.example.trajanmarket.domain.appwrite.AppwriteClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.appwrite.models.Database
 import io.appwrite.services.Account
 import io.appwrite.services.Databases
 import io.ktor.client.HttpClient
@@ -43,12 +41,12 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideCartRepository(
-        api: CartApi,
         productApi: ProductApi,
         userPreferences: UserPreferences,
-        cartDao: CartDao
+        cartDao: CartDao,
+        appwriteDatabases: Databases,
     ) =
-        CartRepository(api, productApi, userPreferences, cartDao)
+        CartRepository(appwriteDatabase = appwriteDatabases, productApi, userPreferences, cartDao)
     
     // AUTH
     @Provides

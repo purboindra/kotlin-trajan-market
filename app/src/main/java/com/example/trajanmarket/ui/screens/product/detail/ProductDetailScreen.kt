@@ -5,6 +5,8 @@ package com.example.trajanmarket.ui.screens.product.detail
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,6 +76,7 @@ import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons as Icons1
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("ResourceType")
 @Composable
 fun ProductDetailScreen(
@@ -217,7 +220,8 @@ fun ProductDetailScreen(
                                 listOf(
                                     AddToCartParams(
                                         id = id,
-                                        quantity = 1
+                                        quantity = 1,
+                                        price=price
                                     )
                                 )
                             )

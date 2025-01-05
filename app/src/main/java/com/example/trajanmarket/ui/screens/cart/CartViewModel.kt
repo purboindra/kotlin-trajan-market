@@ -1,7 +1,9 @@
 package com.example.trajanmarket.ui.screens.cart
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trajanmarket.data.model.CartEntity
@@ -33,6 +35,7 @@ class CartViewModel @Inject constructor(private val cartUseCase: CartUseCase) : 
         MutableStateFlow<State<List<CartEntity>>>(State.Succes(emptyList()))
     val cartLocalListState: StateFlow<State<List<CartEntity>>> = _cartLocalListState
     
+    @RequiresApi(Build.VERSION_CODES.O)
     fun addToCart(products: List<AddToCartParams>) = viewModelScope.launch {
         cartUseCase.addToCart(products).collectLatest { state ->
             _addToCartState.value = state

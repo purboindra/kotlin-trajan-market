@@ -9,6 +9,7 @@ import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.ProductApi
 import com.example.trajanmarket.domain.appwrite.AppwriteClient
 import io.appwrite.ID
+import io.appwrite.Query
 import io.appwrite.services.Databases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +24,6 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
     
     private val databaseId = AppwriteClient.DATABASE_ID
     private val collectionProducts = AppwriteClient.COLLECTION_PRODUCTS
-    
     
     fun fetchAllProducts(sortBy: String?, order: String?, limit: String?): Flow<State<Product>> =
         flow {
@@ -96,7 +96,6 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun storeProductToAppwriteDatabase(product: Product.Product) =
         withContext(Dispatchers.IO) {
-            
             val createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             
             val id = ID.unique()
@@ -118,6 +117,21 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
             )
             
             try {
+                
+                val products = appwriteDatabase.listDocuments(
+                    databaseId,
+                    collectionProducts,
+                    listOf(
+                        Query.equal("name", product.title)
+                    )
+                )
+                
+                val isProductExist = products.documents.isNotEmpty()
+                
+                if (isProductExist) {
+                    throw Exception("Product already exists in Appwrite Database.")
+                }
+                
                 appwriteDatabase.createDocument(
                     databaseId,
                     collectionId = collectionProducts,
