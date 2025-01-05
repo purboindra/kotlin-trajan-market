@@ -117,7 +117,6 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
             )
             
             try {
-                
                 val products = appwriteDatabase.listDocuments(
                     databaseId,
                     collectionProducts,
@@ -135,7 +134,7 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                 appwriteDatabase.createDocument(
                     databaseId,
                     collectionId = collectionProducts,
-                    documentId = ID.unique(),
+                    documentId = id,
                     data = data,
                 )
             } catch (e: Exception) {

@@ -66,8 +66,6 @@ class AuthRepository(
                 session.userId
             )
             
-            Log.d(TAG, "Logged in user: $user")
-            
             userPreferences.saveUserId(user.data["id"] as String)
             userPreferences.saveUserName(user.data["username"] as String)
             userPreferences.saveUserEmail(user.data["email"] as String)
