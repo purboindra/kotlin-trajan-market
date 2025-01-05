@@ -187,7 +187,7 @@ fun ProductDetailScreen(
                                     strokeWidth = 3.dp
                                 )
                             } else Text(
-                                "${(cartLocalListState as? State.Succes)?.data?.size}",
+                                "${(cartLocalListState as? State.Succes)?.data?.size ?: 0}",
                                 modifier = Modifier.align(Alignment.Center),
                                 fontWeight = FontWeight.W500,
                                 color = Color.White,

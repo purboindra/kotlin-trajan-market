@@ -37,7 +37,8 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideProductRepository(api: ProductApi) = ProductRepository(api)
+    fun provideProductRepository(api: ProductApi, appwriteDatabases: Databases) =
+        ProductRepository(api, appwriteDatabases)
     
     @Provides
     @Singleton
