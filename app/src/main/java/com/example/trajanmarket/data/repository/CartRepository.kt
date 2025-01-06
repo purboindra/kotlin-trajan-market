@@ -64,10 +64,11 @@ class CartRepository(
             )
             
             val productId = productsAppwrite.documents[0].id
+            val uniqueId = ID.unique()
             
             // TODO GET PRODUCT ID FROM PARAMATER
             val dataCart = mapOf(
-                "id" to ID.unique(),
+                "id" to uniqueId,
                 "quantity" to "1",
                 "created_at" to createdAt,
                 "price" to products[0].price.toString(),
@@ -78,7 +79,7 @@ class CartRepository(
             appwriteDatabase.createDocument(
                 databaseId,
                 collectionId = collectionCarts,
-                documentId = ID.unique(),
+                documentId = uniqueId,
                 dataCart,
             )
             
