@@ -1,5 +1,7 @@
 package com.example.trajanmarket.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
@@ -11,6 +13,7 @@ import androidx.navigation.createGraph
 import androidx.navigation.navArgument
 import com.example.trajanmarket.ui.screens.login.LoginScreen
 import com.example.trajanmarket.ui.screens.main.MainScreen
+import com.example.trajanmarket.ui.screens.maps.OsmdroidMapScreen
 import com.example.trajanmarket.ui.screens.product.detail.ProductDetailScreen
 import com.example.trajanmarket.ui.screens.profile.ProfileScreen
 import com.example.trajanmarket.ui.screens.register.RegisterScreen
@@ -45,6 +48,9 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             }
             composable<Profile> {
                 ProfileScreen(navHostController = navController)
+            }
+            composable<OsmdroidMaps> {
+                OsmdroidMapScreen(navHostController = navController)
             }
             composable(
                 route = "product_detail/{productId}",

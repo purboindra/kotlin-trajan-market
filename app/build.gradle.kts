@@ -15,7 +15,7 @@ android {
     
     defaultConfig {
         applicationId = "com.example.trajanmarket"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -177,9 +177,9 @@ dependencies {
     // APPWRITE
     implementation("io.appwrite:sdk-for-kotlin:5.0.1")
     
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation(libs.kotlinx.coroutines.play.services)
     
-    
+    implementation(libs.osmdroid.android)
 }
 
 hilt {

@@ -16,3 +16,6 @@ object Splash
 
 @Serializable
 object Profile
+
+@Serializable
+object OsmdroidMaps

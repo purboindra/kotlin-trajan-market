@@ -61,6 +61,7 @@ import com.example.trajanmarket.R
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.ui.components.TextFieldCompose
 import com.example.trajanmarket.ui.navigation.Login
+import com.example.trajanmarket.ui.navigation.OsmdroidMaps
 import com.example.trajanmarket.ui.theme.blue100
 import com.example.trajanmarket.ui.theme.grayLight
 import com.example.trajanmarket.ui.theme.yellow80
@@ -396,6 +397,8 @@ fun RegisterScreen(
                             )
                             
                             registerViewModel.setAddress()
+                            
+                            navHostController.navigate(OsmdroidMaps)
                         } else {
                             println("Activity is null")
                         }
