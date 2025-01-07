@@ -374,9 +374,8 @@ fun RegisterScreen(
                     )
                 10.VerticalSpacer()
                 TextFieldCompose(
-                    value = address,
+                    value = markerData.title,
                     onValueChanged = {
-                        registerViewModel.onUserNameChange(it)
                     },
                     isError = userNameError != null,
                     label = {
@@ -399,8 +398,8 @@ fun RegisterScreen(
                             )
 
                             registerViewModel.setAddress {
+                                registerViewModel.updateMarkerPosition(it.latitude, it.longitude)
                                 navHostController.navigate("osmdroid/${it.latitude}/${it.longitude}/${it.title}")
-
                             }
 
                         } else {

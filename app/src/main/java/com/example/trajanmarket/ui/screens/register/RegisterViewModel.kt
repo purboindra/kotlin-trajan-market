@@ -76,14 +76,19 @@ class RegisterViewModel @Inject constructor(
 
     fun setAddress(onAddressSet: (MarkerData) -> Unit) {
         viewModelScope.launch {
-            val response = locationHelper.getCurrentAddress()
-            Log.d("RegisterViewModel", "Get current address: ${response?.longitude}")
-            if (response != null) {
-                _markerData.value = response
-                onAddressSet(response)
+            Log.d(TAG,"Address _markerData: ${_markerData.value.longitude}")
+            if (_markerData.value.longitude != 0.0) {
+                onAddressSet(_markerData.value)
             } else {
-                Log.d(TAG, "Address null")
+                val response = locationHelper.getCurrentAddress()
+                Log.d("RegisterViewModel", "Get current address: ${response?.longitude}")
+                if (response != null) {
+                    _markerData.value = response
+                    onAddressSet(response)
+
+                }
             }
+
         }
     }
 

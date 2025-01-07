@@ -63,8 +63,8 @@ fun OsmdroidMapScreen(
                                 "Drag ended at: ${updatedPosition.latitude}, ${updatedPosition.longitude}"
                             )
                             registerViewModel.updateMarkerPosition(
-                                it.position.latitude,
-                                it.position.longitude
+                                updatedPosition.latitude,
+                                updatedPosition.longitude
                             )
                         }
                     }
