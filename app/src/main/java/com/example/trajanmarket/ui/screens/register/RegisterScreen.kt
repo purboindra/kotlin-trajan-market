@@ -2,6 +2,7 @@ package com.example.trajanmarket.ui.screens.register
 
 import android.Manifest
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -75,11 +76,11 @@ fun RegisterScreen(
     registerViewModel: RegisterViewModel = hiltViewModel(),
     navHostController: NavHostController,
 ) {
-    
+
     val registerState by registerViewModel.registerState.collectAsState()
-    
+
     val context = LocalContext.current
-    
+
     val userName by registerViewModel.userName.collectAsState()
     val password by registerViewModel.password.collectAsState()
     val hasShowPassword by registerViewModel.showPassword.collectAsState()
@@ -90,16 +91,17 @@ fun RegisterScreen(
     val phoneNumber by registerViewModel.phoneNumber.collectAsState()
     val phoneNumberError by registerViewModel.phoneNumberError.collectAsState()
     val emailError by registerViewModel.emailError.collectAsState()
-    
+    val markerData by registerViewModel.markerData.collectAsState()
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    
+
     val keyboardController = LocalSoftwareKeyboardController.current
-    
+
     val activity = LocalContext.current as? Activity
-    
+
     val locationHelper = remember { LocationHelper(context) }
-    
+
     val requestLocationPermissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val hasFineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
@@ -115,7 +117,7 @@ fun RegisterScreen(
                 }
             }
         }
-    
+
     LaunchedEffect(Unit) {
         println("Requesting location permission")
         locationHelper.setPermissionLauncher(requestLocationPermissions)
@@ -124,8 +126,8 @@ fun RegisterScreen(
             locationPermissionLauncher = requestLocationPermissions
         )
     }
-    
-    
+
+
     LaunchedEffect(registerState) {
         if (registerState is State.Failure) {
             val throwable: Throwable = (registerState as State.Failure).throwable
@@ -136,7 +138,7 @@ fun RegisterScreen(
             navHostController.navigate(route = "main")
         }
     }
-    
+
     val annotatedText = buildAnnotatedString {
         append("Have an account?")
         pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
@@ -151,7 +153,7 @@ fun RegisterScreen(
         }
         pop()
     }
-    
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
@@ -172,12 +174,12 @@ fun RegisterScreen(
                         if (userName.isBlank()) {
                             registerViewModel.onUserNameErrorChange("Username cannot be empty!")
                         }
-                        
+
                         if (password.isBlank()) {
                             registerViewModel.onPasswordErrorChange("Password cannot be empty!")
                             return@ElevatedButton
                         }
-                        
+
                         if (passwordError == null && userNameError == null) {
                             keyboardController?.hide()
                             registerViewModel.register()
@@ -395,10 +397,12 @@ fun RegisterScreen(
                                 activity,
                                 requestLocationPermissions
                             )
-                            
-                            registerViewModel.setAddress()
-                            
-                            navHostController.navigate(OsmdroidMaps)
+
+                            registerViewModel.setAddress {
+                                navHostController.navigate("osmdroid/${it.latitude}/${it.longitude}/${it.title}")
+
+                            }
+
                         } else {
                             println("Activity is null")
                         }

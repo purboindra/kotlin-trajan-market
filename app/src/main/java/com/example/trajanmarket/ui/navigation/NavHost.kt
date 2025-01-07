@@ -1,6 +1,7 @@
 package com.example.trajanmarket.ui.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -49,8 +50,29 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             composable<Profile> {
                 ProfileScreen(navHostController = navController)
             }
-            composable<OsmdroidMaps> {
-                OsmdroidMapScreen(navHostController = navController)
+            composable(
+                route = "osmdroid/{latitude}/{longitude}/{title}",
+                arguments = listOf(
+                    navArgument("latitude") { type = NavType.StringType; defaultValue = "0.0" },
+                    navArgument("longitude") { type = NavType.StringType; defaultValue = "0.0" },
+                    navArgument("title") { type = NavType.StringType; defaultValue = "Unknown" }
+                )
+            ) { backStackEntry ->
+                val latitude =
+                    backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 0.0
+                val longitude =
+                    backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 0.0
+                val title = backStackEntry.arguments?.getString("title") ?: "Unknown"
+
+                // Return default value
+                Log.d("NavHost", "Latitude: ${latitude}, Longitude: $longitude, Title: $title")
+
+                OsmdroidMapScreen(
+                    navHostController = navController,
+                    label = title,
+                    longitude = longitude,
+                    latitude = latitude
+                )
             }
             composable(
                 route = "product_detail/{productId}",

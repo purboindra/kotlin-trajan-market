@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import coil3.Uri
+import com.example.trajanmarket.data.model.MarkerData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
@@ -28,26 +29,26 @@ import java.net.URI
 private const val TAG = "LocationHelper"
 
 class LocationHelper(private val context: Context) {
-    
+
     private val fusedLocationProviderClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
-    
+
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<Array<String>>
-    
+
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
-    
+
     fun setPermissionLauncher(launcher: ActivityResultLauncher<Array<String>>) {
         this.locationPermissionLauncher = launcher
     }
-    
+
     fun requestPermission(activity: Activity) {
         val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        
+
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[0])) {
             Toast.makeText(
                 context,
@@ -59,11 +60,11 @@ class LocationHelper(private val context: Context) {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = android.net.Uri.fromParts("package", context.packageName, null)
             }
-            
+
             context.startActivity(intent)
         }
     }
-    
+
     fun requestLocationPermission(
         activity: Activity,
         locationPermissionLauncher: ActivityResultLauncher<Array<String>>
@@ -83,7 +84,7 @@ class LocationHelper(private val context: Context) {
             )
         }
     }
-    
+
     private fun showPermissionRationale(
         activity: Activity,
         locationPermissionLauncher: ActivityResultLauncher<Array<String>>
@@ -102,12 +103,8 @@ class LocationHelper(private val context: Context) {
             .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
             .show()
     }
-    
-    
-    suspend fun getCurrentAddress(): String? = withContext(Dispatchers.IO) {
-        
-        Log.d(TAG, "Getting current address: ${hasLocationPermission()}")
-        
+
+    suspend fun getCurrentAddress(): MarkerData? = withContext(Dispatchers.IO) {
         try {
             if (ActivityCompat.checkSelfPermission(
                     context,
@@ -119,29 +116,26 @@ class LocationHelper(private val context: Context) {
             ) {
                 return@withContext null
             }
-            
+
             val location: Location? = fusedLocationProviderClient.lastLocation.await()
             location?.let {
                 val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    geocoder.getFromLocation(
-                        location.latitude,
-                        location.longitude,
-                        1
+                val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                val markerData = addresses?.get(0)?.let { marker ->
+                    MarkerData(
+                        longitude = location.longitude,
+                        latitude = location.latitude,
+                        title = marker.countryName
                     )
-                } else {
-                    geocoder.getFromLocation(
-                        location.latitude,
-                        location.longitude,
-                        1
-                    ) ?: mutableListOf()
                 }
-                
-                return@withContext addresses?.firstOrNull()?.getAddressLine(0)
+
+                Log.d(TAG,"Marker data: ${markerData?.longitude}")
+
+                return@withContext markerData
             }
         } catch (e: Exception) {
             Log.e("LocationHelper", "Error getting address: ${e.message}")
+            return@withContext null
         }
-        return@withContext null
     }
 }

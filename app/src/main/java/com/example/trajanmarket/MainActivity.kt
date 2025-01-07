@@ -50,23 +50,16 @@ class MainActivity : ComponentActivity() {
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
-                // You can use the API that requires the permission.
+               Log.d(TAG,"ACCES FINE LOCATION GRANTED")
             }
 
             ActivityCompat.shouldShowRequestPermissionRationale(
                 this, android.Manifest.permission.ACCESS_FINE_LOCATION
             ) -> {
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected, and what
-                // features are disabled if it's declined. In this UI, include a
-                // "cancel" or "no thanks" button that lets the user continue
-                // using your app without granting the permission.
                 Log.d(TAG, "Should show request permission rationale")
             }
 
             else -> {
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
                 requestPermissionLauncher.launch(
                     android.Manifest.permission.ACCESS_FINE_LOCATION
                 )
