@@ -29,7 +29,7 @@ fun CartScreen(
         cartViewModel.getCarts()
     }
     
-    fun handleClickItem(id: Int) {
+    fun handleClickItem(id: String) {
         navHostController.navigate("product_detail/${id}")
     }
     

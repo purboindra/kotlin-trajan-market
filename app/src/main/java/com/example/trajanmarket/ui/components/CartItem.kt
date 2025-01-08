@@ -29,7 +29,7 @@ import com.example.trajanmarket.utils.getOriginalPrice
 fun CartItem(product: Product.Product, onClick: () -> Unit) {
     val price = getOriginalPrice(
         discountPercentage = product.discountPercentage,
-        discountPrice = product.price
+        discountPrice = product.price.toDouble()
     )
     Surface(
         color = Color(0xffFFFFFF),

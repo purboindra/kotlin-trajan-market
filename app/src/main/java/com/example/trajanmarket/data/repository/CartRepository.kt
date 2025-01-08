@@ -29,31 +29,32 @@ import kotlinx.coroutines.coroutineScope
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+private const val TAG = "CartRepository"
+
 class CartRepository(
     private val appwriteDatabase: Databases,
     private val productApi: ProductApi,
     private val userPreferences: UserPreferences,
     private val cartDao: CartDao
 ) {
-    
+
     private val databaseId = AppwriteClient.DATABASE_ID
     private val collectionCarts = AppwriteClient.COLLECTION_CARTS
-    
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun addToCart(products: List<AddToCartParams>): Flow<State<Boolean>> = flow {
-        
+
         emit(State.Loading)
-        
+
         val createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        
+
         val userId = userPreferences.userId.firstOrNull()
-        
+
         try {
-            
+
             if (userId == null) {
                 throw Exception("User ID not valid!")
             }
-            
+
             // TODO REMOVE THIS LOGIC
             val productsAppwrite = appwriteDatabase.listDocuments(
                 databaseId,
@@ -62,10 +63,10 @@ class CartRepository(
                     Query.equal("name", products[0].name)
                 )
             )
-            
+
             val productId = productsAppwrite.documents[0].id
             val uniqueId = ID.unique()
-            
+
             // TODO GET PRODUCT ID FROM PARAMATER
             val dataCart = mapOf(
                 "id" to uniqueId,
@@ -75,74 +76,92 @@ class CartRepository(
                 "products" to productId,
                 "users" to userId,
             )
-            
+
             appwriteDatabase.createDocument(
                 databaseId,
                 collectionId = collectionCarts,
                 documentId = uniqueId,
                 dataCart,
             )
-            
+
             val cartEntity = CartEntity(
                 productId = products[0].id.toInt(),
                 userId = userId,
                 quantity = 1
             )
-            
+
             cartDao.insert(cartEntity)
-            
+
             emit(State.Succes(true))
-            
+
         } catch (e: Throwable) {
             Log.d("error add to cart", e.message ?: "Unknown error")
             emit(State.Failure(e))
         }
     }
-    
+
     fun getCarts(): Flow<State<List<Product.Product>>> = flow {
         emit(State.Loading)
-        
+
+        val products = mutableListOf<Product.Product>()
+
         try {
             val userId = userPreferences.userId.firstOrNull()
             if (userId == null) {
                 emit(State.Failure(IllegalStateException("User ID is null")))
                 return@flow
             }
-            
-            val result = cartDao.getCartByUserId(userId.toInt())
-            
-            val products = coroutineScope {
-                result.map { product ->
-                    async { productApi.fetchProductById(product.productId.toString()) }
-                }.awaitAll()
-            }
-            
-            emit(State.Succes(products))
+
+            val result = appwriteDatabase.listDocuments(
+                databaseId,
+                collectionCarts,
+                queries = listOf(
+                    Query.equal(
+                        "users", userId
+                    )
+                )
+            )
+
+//            for (document in result.documents) {
+//                val productList = document.data["products"] as? List<*>
+//                if (productList != null) {
+//                   for(productMap in productList){
+//                       val product = Product.Product(
+//                           id = productMap["id"] as String,
+//                           name = document.data["name"] as String,
+//                           price = document.data["price"] as String
+//                       )
+//                       products.add
+//                   }
+//                }
+//            }
+
+            emit(State.Succes(emptyList()))
         } catch (e: Throwable) {
             Log.d("error getCartByUserId", e.message ?: "Unknown error")
             emit(State.Failure(e))
         }
     }
-    
+
     fun getLocalCarts(): Flow<State<List<CartEntity>>> = flow {
         emit(State.Loading)
-        
+
         try {
             val userId = userPreferences.userId.firstOrNull()
             if (userId == null) {
                 emit(State.Failure(IllegalStateException("User ID is null")))
                 return@flow
             }
-            
+
             val result = cartDao.getCartByUserId(userId.toInt())
-            
+
             emit(State.Succes(result))
         } catch (e: Throwable) {
             Log.d("error getCartByUserId", e.message ?: "Unknown error")
             emit(State.Failure(e))
         }
     }
-    
+
     fun removeFromCart(productId: String): Flow<State<Boolean>> = flow {
         emit(State.Loading)
         try {

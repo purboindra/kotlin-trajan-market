@@ -70,6 +70,7 @@ fun LoginScreen(
 ) {
 
     val loginState by loginViewModel.loginState.collectAsState()
+    val loginWithGoogleState by loginViewModel.loginWithGoogleState.collectAsState()
 
     val userNamePref by loginViewModel.userNamePref.collectAsState(initial = null)
 
@@ -85,12 +86,12 @@ fun LoginScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(loginState) {
-        if (loginState is State.Failure) {
+        if (loginState is State.Failure || loginWithGoogleState is State.Failure) {
             val throwable: Throwable = (loginState as State.Failure).throwable
             scope.launch {
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occured")
             }
-        } else if (loginState is State.Succes) {
+        } else if (loginState is State.Succes || loginWithGoogleState is State.Succes) {
             navHostController.navigate(route = "main")
         }
     }
@@ -191,7 +192,9 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    onClick = {},
+                    onClick = {
+                        loginViewModel.loginWithGoogle()
+                    },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonColors(
                         contentColor = blue100,
@@ -200,7 +203,24 @@ fun LoginScreen(
                         disabledContentColor = blue100
                     )
                 ) {
-                    Text("Log In With Google", color = Color.White)
+                    if (loginWithGoogleState is State.Loading) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(26.dp),
+                                color = grayLight,
+                                strokeWidth = 5.dp
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "Log In With Google",
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }

@@ -52,7 +52,7 @@ class ProductViewModel @Inject constructor(
             if (state is State.Succes) {
                 val product = state.data
                 getOriginalPrice(
-                    discountPercentage = product.discountPercentage, discountPrice = product.price
+                    discountPercentage = product.discountPercentage, discountPrice = product.price.toDouble()
                 )
             }
         }

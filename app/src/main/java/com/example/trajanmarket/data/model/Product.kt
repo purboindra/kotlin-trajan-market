@@ -30,7 +30,7 @@ data class Product(
         @SerialName("discountPercentage")
         val discountPercentage: Double,
         @SerialName("id")
-        val id: Int,
+        val id: String,
         @SerialName("images")
         val images: List<String>,
         @SerialName("meta")
@@ -38,7 +38,7 @@ data class Product(
         @SerialName("minimumOrderQuantity")
         val minimumOrderQuantity: Int,
         @SerialName("price")
-        val price: Double,
+        val price: String,
         @SerialName("rating")
         val rating: Double,
         @SerialName("returnPolicy")
@@ -49,18 +49,20 @@ data class Product(
         val shippingInformation: String,
         @SerialName("sku")
         val sku: String,
-        @SerialName("stock")
-        val stock: Int,
+        @SerialName("stock_quantity")
+        val stock: String,
         @SerialName("tags")
         val tags: List<String>,
         @SerialName("thumbnail")
         val thumbnail: String,
-        @SerialName("title")
+        @SerialName("name")
         val title: String,
         @SerialName("warrantyInformation")
         val warrantyInformation: String,
         @SerialName("weight")
-        val weight: Int
+        val weight: String,
+        @SerialName("created_at")
+        val createdAt: String,
     ) {
         @Serializable
         data class Dimensions(

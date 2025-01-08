@@ -70,7 +70,7 @@ fun RecommendedCompose(homeViewModel: HomeViewModel, navHostController: NavHostC
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .height(((product.products.size - 1) * 120.dp))
+                            .height(((product.size - 1) * 120.dp))
                     ) {
                         LazyVerticalGrid(
                             modifier = Modifier
@@ -81,7 +81,7 @@ fun RecommendedCompose(homeViewModel: HomeViewModel, navHostController: NavHostC
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
                             userScrollEnabled = false,
                         ) {
-                            items(product.products) { product ->
+                            items(product) { product ->
                                 ProductCategoryCardCompose(
                                     product,
                                     showPrice = true,

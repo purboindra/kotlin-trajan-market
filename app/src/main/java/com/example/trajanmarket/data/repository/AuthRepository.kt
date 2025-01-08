@@ -10,6 +10,7 @@ import com.example.trajanmarket.utils.generateSalt
 import com.example.trajanmarket.utils.hashPasswordSHA256
 import io.appwrite.Client
 import io.appwrite.ID
+import io.appwrite.enums.OAuthProvider
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.User
 import io.appwrite.services.Account
@@ -36,13 +37,13 @@ class AuthRepository(
     private val appwriteAccount: Account,
     private val userPreferences: UserPreferences,
 ) {
-    
+
     private val databaseId = AppwriteClient.DATABASE_ID
-    
+
     private val collectionUsers = AppwriteClient.COLLECTION_USERS
     private val collectionProducts = AppwriteClient.COLLECTION_PRODUCTS
     private val collectionCarts = AppwriteClient.COLLECTION_CARTS
-    
+
     fun getLoggedIn() = flow<State<User<Map<String, Any>>?>> {
         try {
             val user = appwriteAccount.get()
@@ -53,31 +54,52 @@ class AuthRepository(
             emit(State.Failure(e))
         }
     }
-    
+
+    fun loginWithGoogle() = flow<State<Boolean>> {
+        emit(State.Loading)
+        try {
+            val account = Account(AppwriteClient.client)
+            account.createOAuth2Token(
+                provider = OAuthProvider.GOOGLE,
+                scopes = listOf(
+                )
+            )
+
+            val user = getLoggedIn()
+
+            Log.d(TAG, "Logged in wigh google user: ${user}")
+
+            emit(State.Succes(true))
+
+        } catch (e: Exception) {
+            Log.d(TAG, "Error login with google: ${e.message}")
+            emit(State.Failure(e))
+        }
+    }
+
     fun login(email: String, password: String): Flow<State<Boolean>> = flow {
         emit(State.Loading)
         try {
             val session =
                 appwriteAccount.createEmailPasswordSession(email = email, password = password)
-            
+
             val user = appwriteDatabase.getDocument(
                 databaseId,
                 collectionUsers,
                 session.userId
             )
-            
+
             userPreferences.saveUserId(user.data["id"] as String)
             userPreferences.saveUserName(user.data["username"] as String)
             userPreferences.saveUserEmail(user.data["email"] as String)
-            
+
             emit(State.Succes(true))
         } catch (e: Exception) {
             Log.d(TAG, "Error during login: ${e.message}")
             emit(State.Failure(e))
         }
     }
-    
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun register(
         username: String,
         password: String,
@@ -87,7 +109,7 @@ class AuthRepository(
     ) =
         flow {
             emit(State.Loading)
-            
+
             try {
                 val user = try {
                     appwriteAccount.create(ID.unique(), email, password, name = username)
@@ -96,14 +118,14 @@ class AuthRepository(
                     emit(State.Failure(e))
                     return@flow
                 }
-                
+
                 val date = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                
+
                 val userId = user.id
-                
+
                 val salt = generateSalt()
                 val hashedPassword = hashPasswordSHA256(password, salt)
-                
+
                 val userDocument = mapOf(
                     "id" to userId,
                     "username" to username,
@@ -116,7 +138,7 @@ class AuthRepository(
                     "email_verification" to user.emailVerification,
                     "phone_verification" to user.phoneVerification,
                 )
-                
+
                 appwriteDatabase.createDocument(
                     collectionId = collectionUsers,
                     data = userDocument,
@@ -124,16 +146,16 @@ class AuthRepository(
                     documentId = userId,
                     permissions = listOf()
                 )
-                
+
                 login(email, password)
-                
+
                 emit(State.Succes(true))
             } catch (e: Exception) {
                 Log.d(TAG, "Error registering user: ${e.message}")
                 emit(State.Failure(e))
             }
         }
-    
+
     fun logout() = flow {
         emit(State.Loading)
         try {

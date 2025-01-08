@@ -14,10 +14,11 @@ class AuthUseCase @Inject constructor(
 ) {
     fun login(username: String, password: String): Flow<State<Boolean>> =
         authRepository.login(username, password)
-    
+
+    fun loginWithGoogle(): Flow<State<Boolean>> = authRepository.loginWithGoogle()
+
     fun getLoggedIn(): Flow<State<User<Map<String, Any>>?>> = authRepository.getLoggedIn()
-    
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun register(
         username: String,
         password: String,
@@ -26,6 +27,6 @@ class AuthUseCase @Inject constructor(
         address: String,
     ): Flow<State<Boolean>> =
         authRepository.register(username, password, email, phoneNumber, address)
-    
+
     fun logout(): Flow<State<Boolean>> = authRepository.logout()
 }
