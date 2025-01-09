@@ -11,15 +11,15 @@ class GetProductUseCase @Inject constructor(private val productRepository: Produ
         sortBy: String?,
         order: String?,
         limit: String?
-    ): Flow<State<List<Product.Product>>> =
+    ): Flow<State<Product>> =
         productRepository.fetchAllProducts(sortBy, order, limit)
-    
+
     fun fetchProductsByCategory(category: String) =
         productRepository.fetchProductsByCategory(category)
-    
+
     fun fetchCategoryProductList() = productRepository.fetchCategoryProductList()
-    
+
     fun fetchProductById(id: String) = productRepository.fetchProductById(id)
-    
+
     fun searchProduct(query: String?) = productRepository.searchProduct(query)
 }

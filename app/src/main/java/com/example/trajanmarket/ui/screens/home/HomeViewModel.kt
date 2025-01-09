@@ -25,8 +25,8 @@ class HomeViewModel @Inject constructor(
     private val _categories = MutableStateFlow<State<List<String>>>(State.Idle)
     val categories: StateFlow<State<List<String>>> = _categories
     
-    private val _products = MutableStateFlow<State<List<Product.Product>>>(State.Idle)
-    val products: StateFlow<State<List<Product.Product>>> = _products
+    private val _products = MutableStateFlow<State<Product>>(State.Idle)
+    val products: StateFlow<State<Product>> = _products
     
     private val _productsByCategory = MutableStateFlow<State<Product>>(State.Idle)
     val productsByCategory: StateFlow<State<Product>> = _productsByCategory

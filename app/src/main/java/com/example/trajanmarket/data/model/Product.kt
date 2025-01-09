@@ -17,87 +17,89 @@ data class Product(
 ) {
     @Serializable
     data class Product(
+        @SerialName("appwrite_id")
+        val appwriteId: String = "",
         @SerialName("availabilityStatus")
-        val availabilityStatus: String,
+        val availabilityStatus: String="",
         @SerialName("brand")
-        val brand: String? = null,
+        val brand: String = "",
         @SerialName("category")
-        val category: String,
+        val category: String="",
         @SerialName("description")
-        val description: String,
+        val description: String="",
         @SerialName("dimensions")
-        val dimensions: Dimensions,
+        val dimensions: Dimensions? = null,
         @SerialName("discountPercentage")
-        val discountPercentage: Double,
+        val discountPercentage: Double=0.0,
         @SerialName("id")
-        val id: String,
+        val id: String="",
         @SerialName("images")
-        val images: List<String>,
+        val images: List<String> = emptyList(),
         @SerialName("meta")
-        val meta: Meta,
+        val meta: Meta? = null,
         @SerialName("minimumOrderQuantity")
-        val minimumOrderQuantity: Int,
+        val minimumOrderQuantity: Int = 0,
         @SerialName("price")
-        val price: String,
+        val price: String = "",
         @SerialName("rating")
-        val rating: Double,
+        val rating: Double = 0.0,
         @SerialName("returnPolicy")
-        val returnPolicy: String,
+        val returnPolicy: String = "",
         @SerialName("reviews")
-        val reviews: List<Review>,
+        val reviews: List<Review> = emptyList(),
         @SerialName("shippingInformation")
-        val shippingInformation: String,
+        val shippingInformation: String="",
         @SerialName("sku")
-        val sku: String,
+        val sku: String="",
         @SerialName("stock_quantity")
-        val stock: String? = null,
+        val stock: String = "0",
         @SerialName("tags")
-        val tags: List<String>,
+        val tags: List<String> = emptyList(),
         @SerialName("thumbnail")
-        val thumbnail: String,
-        @SerialName("name")
-        val title: String? = null,
+        val thumbnail: String="",
+        @SerialName("title")
+        val title: String = "",
         @SerialName("warrantyInformation")
-        val warrantyInformation: String,
+        val warrantyInformation: String="",
         @SerialName("weight")
-        val weight: String,
+        val weight: String="",
         @SerialName("created_at")
-        val createdAt: String? = null,
+        val createdAt: String = "",
     ) {
         @Serializable
         data class Dimensions(
             @SerialName("depth")
-            val depth: Double,
+            val depth: Double = 0.0,
             @SerialName("height")
-            val height: Double,
+            val height: Double = 0.0,
             @SerialName("width")
-            val width: Double
+            val width: Double = 0.0
         )
-        
+
         @Serializable
         data class Meta(
             @SerialName("barcode")
-            val barcode: String,
+            val barcode: String = "",
             @SerialName("createdAt")
-            val createdAt: String,
+            val createdAt: String = "",
             @SerialName("qrCode")
-            val qrCode: String,
+            val qrCode: String = "",
             @SerialName("updatedAt")
-            val updatedAt: String
+            val updatedAt: String = ""
         )
-        
+
         @Serializable
         data class Review(
             @SerialName("comment")
-            val comment: String,
+            val comment: String = "",
             @SerialName("date")
-            val date: String,
+            val date: String = "",
             @SerialName("rating")
-            val rating: Int,
+            val rating: Int = 0,
             @SerialName("reviewerEmail")
-            val reviewerEmail: String,
+            val reviewerEmail: String = "",
             @SerialName("reviewerName")
-            val reviewerName: String
+            val reviewerName: String = ""
         )
     }
 }

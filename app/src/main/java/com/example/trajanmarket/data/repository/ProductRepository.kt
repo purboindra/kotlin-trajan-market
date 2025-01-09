@@ -9,6 +9,9 @@ import io.appwrite.ID
 import io.appwrite.Query
 import io.appwrite.services.Databases
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -28,40 +31,62 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
         sortBy: String?,
         order: String?,
         limit: String?
-    ): Flow<State<List<Product.Product>>> =
+    ): Flow<State<Product>> =
         flow {
-
-
             emit(State.Loading)
             try {
-                val products = mutableListOf<Product.Product>()
-
-                val documents = appwriteDatabase.listDocuments(
-                    databaseId,
-                    collectionProducts,
+                val product = api.fetchAllProducts(
+                    sortBy,
+                    order, limit
                 )
 
-                Log.d(TAG, "Documents products: $documents")
+                val products = product.products
 
-                if (documents.total.toInt() == 0) {
-                    emit(State.Succes(products))
-                    return@flow
+                val enrichedProducts = coroutineScope {
+                    products.map { product ->
+                        async {
+                            val appwriteId = ID.unique()
+                            val enrichedProduct = product.copy(appwriteId = appwriteId)
+
+                            try {
+                                storeProductToAppwriteDatabase(enrichedProduct)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error storing product: ${e.message}")
+                            }
+
+                            enrichedProduct
+                        }
+                    }.awaitAll()
                 }
 
-                for (document in documents.documents) {
-                    val data = document.data
-                    Log.d(TAG, "Data: $data")
-                    val dataToString = Json.encodeToString(data)
-                    Log.d(TAG,"data to string: $dataToString")
-                    val product = Json.decodeFromString<Product.Product>(dataToString)
+                val enrichedProduct = product.copy(
+                    products = enrichedProducts
+                )
 
-                    Log.d(TAG, "Decode product: $product")
 
-                    products.add(product)
+                val appwriteProduct = appwriteDatabase.listDocuments(
+                    databaseId,
+                    collectionProducts
+                )
+
+                val appwriteProductList = appwriteProduct.documents
+
+                for(appwriteProductTest in appwriteProductList){
+                    Log.d("TEST","Product test: ${appwriteProductTest.data}")
+                    val encode = Json.encodeToString(appwriteProductTest.data)
+                    Log.d("TEST","Product test: $encode")
                 }
 
-                emit(State.Succes(products))
+                val appwriteProducts = appwriteProductList.map {
+                    Log.d("Product", it.data.toString())
+                    val dataToString = Json.encodeToString(it.data)
+                    Log.d("Product", "Data to string: $dataToString")
+                    Json.decodeFromString<Product>(dataToString)
+                }
 
+                Log.d("Product", "appwrite products: $appwriteProducts")
+
+                emit(State.Succes(enrichedProduct))
             } catch (e: Exception) {
                 Log.d(TAG, "Error fetch all products: ${e.message}")
 
@@ -74,17 +99,24 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
         emit(State.Loading)
         try {
             val product = api.fetchProductsByCategory(category)
+
+//            val products = product.products
+//
+//            val enrichedProducts = products.map {
+//                val id = ID.unique()
+//                val enrichedProduct = it.copy(
+//                    appwriteId = id
+//                )
+//                enrichedProduct
+//            }
+//
+//            val enrichedProduct = product.copy(
+//                products = enrichedProducts
+//            )
+
             emit(State.Succes(product))
         } catch (e: Exception) {
-            Log.e(
-                "fetchProductsByCategory Repository",
-                "An error occurred while fetching products by category",
-                e
-            )
 
-            Log.e("fetchProductsByCategory Message", "Error Message: ${e.message}")
-            Log.e("fetchProductsByCategory Cause", "Cause: ${e.cause}")
-            Log.e("fetchProductsByCategory Stack Trace", Log.getStackTraceString(e))
             emit(State.Failure(e))
         }
     }
@@ -153,7 +185,7 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                     databaseId,
                     collectionProducts,
                     listOf(
-                        Query.equal("name", product.title?:"")
+                        Query.equal("name", product.title ?: "")
                     )
                 )
 

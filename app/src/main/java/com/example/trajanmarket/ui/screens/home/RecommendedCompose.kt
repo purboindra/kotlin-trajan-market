@@ -1,5 +1,6 @@
 package com.example.trajanmarket.ui.screens.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,9 +29,9 @@ import com.example.trajanmarket.utils.VerticalSpacer
 
 @Composable
 fun RecommendedCompose(homeViewModel: HomeViewModel, navHostController: NavHostController) {
-    
+
     val productState by homeViewModel.products.collectAsState()
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -64,24 +66,24 @@ fun RecommendedCompose(homeViewModel: HomeViewModel, navHostController: NavHostC
                         }
                     }
                 }
-                
+
                 is State.Succes -> {
                     val product = (productState as State.Succes).data
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .height(((product.size - 1) * 120.dp))
+                            .height(((product.products.size - 1) * 120.dp))
                     ) {
                         LazyVerticalGrid(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f),
                             columns = GridCells.Fixed(2),
-                            
+
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
                             userScrollEnabled = false,
                         ) {
-                            items(product) { product ->
+                            items(product.products) { product ->
                                 ProductCategoryCardCompose(
                                     product,
                                     showPrice = true,
@@ -91,11 +93,22 @@ fun RecommendedCompose(homeViewModel: HomeViewModel, navHostController: NavHostC
                         }
                     }
                 }
-                
+
                 is State.Failure -> {
                     val throwable = (productState as State.Failure)
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp, vertical = 8.dp)
+                            .fillMaxSize(),
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = throwable.throwable.message.toString())
+                        }
+                    }
                 }
-                
+
                 else -> {}
             }
         }
