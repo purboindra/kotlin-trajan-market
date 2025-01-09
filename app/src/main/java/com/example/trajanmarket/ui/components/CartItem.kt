@@ -54,7 +54,7 @@ fun CartItem(product: Product.Product, onClick: () -> Unit) {
                     8.HorizontalSpacer()
                     Column {
                         Text(
-                            product.title,
+                            product.title?:"-",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 color = gray1,
                             ),

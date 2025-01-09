@@ -153,7 +153,7 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                     databaseId,
                     collectionProducts,
                     listOf(
-                        Query.equal("name", product.title)
+                        Query.equal("name", product.title?:"")
                     )
                 )
 

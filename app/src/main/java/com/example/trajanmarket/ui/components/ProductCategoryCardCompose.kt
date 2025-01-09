@@ -62,7 +62,7 @@ fun ProductCategoryCardCompose(
                 8.VerticalSpacer()
                 
                 Text(
-                    product.title,
+                    product.title?:"-",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.W700,
                     overflow = TextOverflow.Ellipsis,

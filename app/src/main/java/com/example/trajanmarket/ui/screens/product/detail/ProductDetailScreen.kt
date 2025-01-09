@@ -222,7 +222,7 @@ fun ProductDetailScreen(
                                         id = id,
                                         quantity = 1,
                                         price = price,
-                                        name = (productByIdState as State.Succes).data.title
+                                        name = (productByIdState as State.Succes).data.title?:"-"
                                     )
                                 )
                             )
@@ -326,7 +326,7 @@ fun ProductDetailScreen(
                                 )
                                 5.VerticalSpacer()
                                 Text(
-                                    product.title,
+                                    product.title?:"-",
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 

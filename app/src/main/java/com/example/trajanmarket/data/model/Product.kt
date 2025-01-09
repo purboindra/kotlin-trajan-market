@@ -50,19 +50,19 @@ data class Product(
         @SerialName("sku")
         val sku: String,
         @SerialName("stock_quantity")
-        val stock: String,
+        val stock: String? = null,
         @SerialName("tags")
         val tags: List<String>,
         @SerialName("thumbnail")
         val thumbnail: String,
         @SerialName("name")
-        val title: String,
+        val title: String? = null,
         @SerialName("warrantyInformation")
         val warrantyInformation: String,
         @SerialName("weight")
         val weight: String,
         @SerialName("created_at")
-        val createdAt: String,
+        val createdAt: String? = null,
     ) {
         @Serializable
         data class Dimensions(
