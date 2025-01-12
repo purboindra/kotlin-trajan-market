@@ -141,7 +141,6 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
             val appwriteProduct = try {
                 storeProductToAppwriteDatabase(product)
             } catch (e: Exception) {
-                Log.d(TAG, "Error storing product to Appwrite Database: ${e.message}")
                 throw Exception("Error storing product to Appwrite Database: ${e.message}")
             }
 
@@ -212,7 +211,11 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                     data = data,
                 )
 
-                throw Exception("Product not found")
+                // AFTER STORE TO DB
+                // RETURN JUST ID
+                return@withContext mapOf(
+                    "id" to id,
+                )
 
             } catch (e: Exception) {
                 Log.d(TAG, "Error storing product: ${e.message}")
