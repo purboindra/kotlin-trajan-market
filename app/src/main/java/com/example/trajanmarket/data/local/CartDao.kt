@@ -12,7 +12,7 @@ interface CartDao {
     suspend fun insert(cartEntity: CartEntity)
     
     @Query("SELECT * from cart_table WHERE userId = :userId")
-    suspend fun getCartByUserId(userId: Int): List<CartEntity>
+    suspend fun getCartByUserId(userId: String): List<CartEntity>
     
     @Query("SELECT * from cart_table WHERE productId = :productId")
     suspend fun getCartByProductId(productId: Int): CartEntity?

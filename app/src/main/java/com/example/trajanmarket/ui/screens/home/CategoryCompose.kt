@@ -1,5 +1,6 @@
 package com.example.trajanmarket.ui.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,6 +63,7 @@ fun CategoryCompose(homeViewModel: HomeViewModel, navHostController: NavHostCont
                     val products = product.products
                     LazyRow(modifier = Modifier.padding(horizontal = 8.dp)) {
                         items(products) { product ->
+                            Log.d("Testttt","Product id: ${product.id}")
                             ProductCategoryCardCompose(
                                 product,
                                 navHostController = navHostController

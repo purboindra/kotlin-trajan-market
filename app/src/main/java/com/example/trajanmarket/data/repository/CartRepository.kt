@@ -41,7 +41,7 @@ class CartRepository(
     private val databaseId = AppwriteClient.DATABASE_ID
     private val collectionCarts = AppwriteClient.COLLECTION_CARTS
 
-    fun addToCart(products: List<AddToCartParams>): Flow<State<Boolean>> = flow {
+    fun addToCart(product: Product.Product): Flow<State<Boolean>> = flow {
 
         emit(State.Loading)
 
@@ -60,19 +60,18 @@ class CartRepository(
                 databaseId,
                 AppwriteClient.COLLECTION_PRODUCTS,
                 listOf(
-                    Query.equal("name", products[0].name)
+                    Query.equal("name", product.title)
                 )
             )
 
-            val productId = productsAppwrite.documents[0].id
+            val productId = productsAppwrite.documents.first().id
             val uniqueId = ID.unique()
 
-            // TODO GET PRODUCT ID FROM PARAMATER
             val dataCart = mapOf(
                 "id" to uniqueId,
                 "quantity" to "1",
                 "created_at" to createdAt,
-                "price" to products[0].price.toString(),
+                "price" to product.price,
                 "products" to productId,
                 "users" to userId,
             )
@@ -85,7 +84,7 @@ class CartRepository(
             )
 
             val cartEntity = CartEntity(
-                productId = products[0].id.toInt(),
+                productId = product.id.toInt(),
                 userId = userId,
                 quantity = 1
             )
@@ -112,7 +111,7 @@ class CartRepository(
                 return@flow
             }
 
-            val result = appwriteDatabase.listDocuments(
+            val appwriteProductList = appwriteDatabase.listDocuments(
                 databaseId,
                 collectionCarts,
                 queries = listOf(
@@ -122,42 +121,34 @@ class CartRepository(
                 )
             )
 
-//            for (document in result.documents) {
-//                val productList = document.data["products"] as? List<*>
-//                if (productList != null) {
-//                   for(productMap in productList){
-//                       val product = Product.Product(
-//                           id = productMap["id"] as String,
-//                           name = document.data["name"] as String,
-//                           price = document.data["price"] as String
-//                       )
-//                       products.add
-//                   }
-//                }
-//            }
+            val appwriteProducts = appwriteProductList.documents.map {
 
-            emit(State.Succes(emptyList()))
-        } catch (e: Throwable) {
-            Log.d("error getCartByUserId", e.message ?: "Unknown error")
-            emit(State.Failure(e))
-        }
-    }
+                val data = it.data["products"] as Map<*, *>
 
-    fun getLocalCarts(): Flow<State<List<CartEntity>>> = flow {
-        emit(State.Loading)
-
-        try {
-            val userId = userPreferences.userId.firstOrNull()
-            if (userId == null) {
-                emit(State.Failure(IllegalStateException("User ID is null")))
-                return@flow
+                val product = Product.Product(
+                    id = data["id"] as String,
+                    title = data["name"] as String,
+                    description = data["description"] as String,
+                    price = data["price"] as String,
+                    thumbnail = data["thumbnail"] as String,
+                    sku = data["sku"] as String,
+                    stock = data["stock_quantity"] as String,
+                    availabilityStatus = "",
+                    weight = data["weight"] as String,
+                    rating = data["average_rating"] as Double,
+                    createdAt = "",
+                    images = data["images"] as List<String>,
+                    tags = data["tags"] as List<String>,
+                )
+                product
             }
 
-            val result = cartDao.getCartByUserId(userId.toInt())
+            products.addAll(appwriteProducts)
 
-            emit(State.Succes(result))
+            emit(State.Succes(products))
         } catch (e: Throwable) {
-            Log.d("error getCartByUserId", e.message ?: "Unknown error")
+            Log.d("error getCarts", e.message ?: "Unknown error")
+            e.printStackTrace()
             emit(State.Failure(e))
         }
     }

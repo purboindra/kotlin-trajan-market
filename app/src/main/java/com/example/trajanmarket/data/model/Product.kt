@@ -18,21 +18,21 @@ data class Product(
     @Serializable
     data class Product(
         @SerialName("appwrite_id")
-        val appwriteId: String = "",
+        val appwriteId: String? = null,
         @SerialName("availabilityStatus")
-        val availabilityStatus: String="",
+        val availabilityStatus: String = "",
         @SerialName("brand")
         val brand: String = "",
         @SerialName("category")
-        val category: String="",
+        val category: String = "",
         @SerialName("description")
-        val description: String="",
+        val description: String = "",
         @SerialName("dimensions")
         val dimensions: Dimensions? = null,
         @SerialName("discountPercentage")
-        val discountPercentage: Double=0.0,
+        val discountPercentage: Double = 0.0,
         @SerialName("id")
-        val id: String="",
+        val id: String = "",
         @SerialName("images")
         val images: List<String> = emptyList(),
         @SerialName("meta")
@@ -46,23 +46,23 @@ data class Product(
         @SerialName("returnPolicy")
         val returnPolicy: String = "",
         @SerialName("reviews")
-        val reviews: List<Review> = emptyList(),
+        val reviews: List<Review>? = null,
         @SerialName("shippingInformation")
-        val shippingInformation: String="",
+        val shippingInformation: String = "",
         @SerialName("sku")
-        val sku: String="",
+        val sku: String = "",
         @SerialName("stock_quantity")
         val stock: String = "0",
         @SerialName("tags")
         val tags: List<String> = emptyList(),
         @SerialName("thumbnail")
-        val thumbnail: String="",
+        val thumbnail: String = "",
         @SerialName("title")
         val title: String = "",
         @SerialName("warrantyInformation")
-        val warrantyInformation: String="",
+        val warrantyInformation: String = "",
         @SerialName("weight")
-        val weight: String="",
+        val weight: String = "",
         @SerialName("created_at")
         val createdAt: String = "",
     ) {

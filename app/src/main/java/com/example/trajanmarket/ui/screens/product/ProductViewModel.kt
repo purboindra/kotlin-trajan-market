@@ -25,16 +25,16 @@ class ProductViewModel @Inject constructor(
 ) : ViewModel() {
     private val _productState = MutableStateFlow<State<Product>>(State.Idle)
     var productState: StateFlow<State<Product>> = _productState
-    
+
     private val _price = MutableStateFlow(0.0)
     val price: StateFlow<Double> = _price
-    
+
     private val _productByIdState = MutableStateFlow<State<Product.Product>>(State.Idle)
     val productByIdState: StateFlow<State<Product.Product>> = _productByIdState
-    
+
     private val _hasProductInCart = MutableStateFlow(false)
     val hasProductInCart: StateFlow<Boolean> = _hasProductInCart
-    
+
     @SuppressLint("DefaultLocale")
     private fun getOriginalPrice(discountPercentage: Double, discountPrice: Double) {
         if (discountPercentage >= 100.0 || discountPercentage < 0) {
@@ -45,45 +45,17 @@ class ProductViewModel @Inject constructor(
         val formattedNumber = String.format("%.2f", realPrice).toDouble()
         _price.update { formattedNumber }
     }
-    
+
     fun fetchProductById(id: String) = viewModelScope.launch {
         getProductUseCase.fetchProductById(id).collectLatest { state ->
             _productByIdState.emit(state)
             if (state is State.Succes) {
                 val product = state.data
                 getOriginalPrice(
-                    discountPercentage = product.discountPercentage, discountPrice = product.price.toDouble()
+                    discountPercentage = product.discountPercentage,
+                    discountPrice = product.price.toDouble()
                 )
             }
         }
     }
-    
-    fun checkProductInCart(id: String) {
-        viewModelScope.launch {
-            cartUseCase.getLocalCarts()
-                .map { cartListState ->
-                    val isProductInCart =
-                        (cartListState as? State.Succes)?.data?.any {
-                            (it.productId ?: -1) == id.toInt()
-                        }
-                    Log.d(
-                        "checkProductInCart",
-                        "cartListState: $cartListState, isProductInCart: $isProductInCart"
-                    )
-                    isProductInCart
-                }
-                .collect { isInCart ->
-                    isInCart?.let {
-                        Log.d(
-                            "checkProductInCart",
-                            "Updating state with: $isInCart for productId: $id"
-                        )
-                        _hasProductInCart.value = it
-                    } ?: run {
-                        Log.d("checkProductInCart", "isInCart is null for productId: $id")
-                    }
-                }
-        }
-    }
-    
 }

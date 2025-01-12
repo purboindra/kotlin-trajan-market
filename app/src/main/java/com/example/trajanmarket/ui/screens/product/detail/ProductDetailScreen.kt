@@ -1,5 +1,3 @@
-@file:Suppress("INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING")
-
 package com.example.trajanmarket.ui.screens.product.detail
 
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -60,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.trajanmarket.data.model.CartEntity
 import com.example.trajanmarket.data.model.State
 import com.example.trajanmarket.data.remote.api.AddToCartParams
 import com.example.trajanmarket.ui.components.PriceContainerCompose
@@ -76,7 +75,6 @@ import com.example.trajanmarket.utils.VerticalSpacer
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons as Icons1
 
-@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("ResourceType")
 @Composable
 fun ProductDetailScreen(
@@ -89,41 +87,40 @@ fun ProductDetailScreen(
     val price by productViewModel.price.collectAsState()
     val hasProductInCart by productViewModel.hasProductInCart.collectAsState()
     val addToCartState by cartViewModel.addToCartState.collectAsState()
-    val cartLocalListState by cartViewModel.cartLocalListState.collectAsState()
+    val cartListState by cartViewModel.cartListState.collectAsState()
     val removeFromCartState by cartViewModel.removeFromCartState.collectAsState()
-    
+
     val coroutineScope = rememberCoroutineScope()
-    
+
     val snackbarHostState = remember { SnackbarHostState() }
-    
+
     var snackbarColor by remember {
         mutableStateOf(Color.Red)
     }
-    
+
     LaunchedEffect(Unit) {
         productViewModel.fetchProductById(id)
-        cartViewModel.getLocalCarts()
-        productViewModel.checkProductInCart(id)
+        cartViewModel.getCarts()
     }
-    
+
     LaunchedEffect(addToCartState) {
         when (addToCartState) {
             is State.Failure -> {
                 val throwable = (addToCartState as State.Failure).throwable
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
             }
-            
+
             is State.Succes -> {
-                cartViewModel.getLocalCarts()
-                productViewModel.checkProductInCart(id)
+                /// TODO
+//                productViewModel.checkProductInCart(id)
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success add to cart!")
             }
-            
+
             else -> {}
         }
     }
-    
+
     LaunchedEffect(removeFromCartState) {
         when (removeFromCartState) {
             is State.Failure -> {
@@ -131,18 +128,19 @@ fun ProductDetailScreen(
                 snackbarColor = Color.Red
                 snackbarHostState.showSnackbar(throwable.message ?: "Unknown Error Occurred")
             }
-            
+
             is State.Succes -> {
-                cartViewModel.getLocalCarts()
-                productViewModel.checkProductInCart(id)
+                cartViewModel.getCarts()
+                /// TODO
+//                productViewModel.checkProductInCart(id)
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success remove from cart!")
             }
-            
+
             else -> {}
         }
     }
-    
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
@@ -180,7 +178,7 @@ fun ProductDetailScreen(
                                 .background(Color.Black)
                                 .align(Alignment.BottomEnd)
                         ) {
-                            if (cartLocalListState is State.Loading) Box(
+                            if (cartListState is State.Loading) Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -189,8 +187,8 @@ fun ProductDetailScreen(
                                     color = grayLight,
                                     strokeWidth = 3.dp
                                 )
-                            } else Text(
-                                "${(cartLocalListState as? State.Succes)?.data?.size ?: 0}",
+                            } else if (cartListState is State.Succes) Text(
+                                "${(cartListState as State.Succes<List<CartEntity>>).data.size}",
                                 modifier = Modifier.align(Alignment.Center),
                                 fontWeight = FontWeight.W500,
                                 color = Color.White,
@@ -212,19 +210,12 @@ fun ProductDetailScreen(
                 ),
                 enabled = addToCartState !is State.Loading &&
                         removeFromCartState !is State.Loading &&
-                        cartLocalListState !is State.Loading,
+                        cartListState !is State.Loading && productByIdState !is State.Loading,
                 onClick = {
                     coroutineScope.launch {
                         if (!hasProductInCart) {
                             cartViewModel.addToCart(
-                                listOf(
-                                    AddToCartParams(
-                                        id = id,
-                                        quantity = 1,
-                                        price = price,
-                                        name = (productByIdState as State.Succes).data.title?:"-"
-                                    )
-                                )
+                                product = (productByIdState as State.Succes).data
                             )
                         } else {
                             cartViewModel.removeFromCart(id)
@@ -232,7 +223,7 @@ fun ProductDetailScreen(
                     }
                 }
             ) {
-                if (addToCartState is State.Loading || removeFromCartState is State.Loading || cartLocalListState is State.Loading) {
+                if (addToCartState is State.Loading || removeFromCartState is State.Loading || cartListState is State.Loading) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
@@ -251,8 +242,8 @@ fun ProductDetailScreen(
                         )
                     )
                 }
-                
-                
+
+
             }
         }
     ) { paddingValues ->
@@ -269,7 +260,7 @@ fun ProductDetailScreen(
                             CircularProgressIndicator()
                         }
                     }
-                    
+
                     is State.Succes -> {
                         val product = (productByIdState as State.Succes).data
                         Column {
@@ -294,13 +285,13 @@ fun ProductDetailScreen(
                                     )
                                 }
                             }
-                            
+
                             10.VerticalSpacer()
-                            
+
                             Column(modifier = Modifier.safeContentPadding()) {
-                                
+
                                 5.VerticalSpacer()
-                                
+
                                 LazyRow() {
                                     items(product.images) { item ->
                                         Box(
@@ -317,7 +308,7 @@ fun ProductDetailScreen(
                                         }
                                     }
                                 }
-                                
+
                                 Text(
                                     product.category,
                                     style = MaterialTheme.typography.labelLarge.copy(
@@ -326,12 +317,12 @@ fun ProductDetailScreen(
                                 )
                                 5.VerticalSpacer()
                                 Text(
-                                    product.title?:"-",
+                                    product.title ?: "-",
                                     style = MaterialTheme.typography.titleMedium,
                                 )
-                                
+
                                 10.VerticalSpacer()
-                                
+
                                 PriceContainerCompose(product, price)
                                 8.VerticalSpacer()
                                 HorizontalDivider(
@@ -393,12 +384,12 @@ fun ProductDetailScreen(
                             }
                         }
                     }
-                    
+
                     is State.Failure -> {
                         val throwable = (productByIdState as State.Failure).throwable
                         Text(throwable.message ?: "Unknown Error")
                     }
-                    
+
                     else -> {}
                 }
             }

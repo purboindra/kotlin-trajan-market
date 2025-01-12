@@ -40,53 +40,56 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                     order, limit
                 )
 
-                val products = product.products
+//                val products = product.products
 
-                val enrichedProducts = coroutineScope {
-                    products.map { product ->
-                        async {
-                            val appwriteId = ID.unique()
-                            val enrichedProduct = product.copy(appwriteId = appwriteId)
+//                val enrichedProducts = coroutineScope {
+//                    products.map { product ->
+//                        async {
+//                            val appwriteId = ID.unique()
+//                            val enrichedProduct = product.copy(appwriteId = appwriteId)
+//
+//                            try {
+//                                storeProductToAppwriteDatabase(enrichedProduct)
+//                            } catch (e: Exception) {
+//                                Log.e(TAG, "Error storing product: ${e.message}")
+//                            }
+//
+//                            enrichedProduct
+//                        }
+//                    }.awaitAll()
+//                }
+//
+//                val enrichedProduct = product.copy(
+//                    products = enrichedProducts
+//                )
 
-                            try {
-                                storeProductToAppwriteDatabase(enrichedProduct)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Error storing product: ${e.message}")
-                            }
+//                val appwriteProduct = appwriteDatabase.listDocuments(
+//                    databaseId,
+//                    collectionProducts
+//                )
+//
+//                val appwriteProductList = appwriteProduct.documents
+//
+//                val appwriteProducts = appwriteProductList.map {
+//                    Product.Product(
+//                        id = it.data["id"] as String,
+//                        title = it.data["name"] as String,
+//                        description = it.data["description"] as String,
+//                        price = it.data["price"] as String,
+//                        thumbnail = it.data["thumbnail"] as String,
+//                        sku = it.data["sku"] as String,
+//                        stock = it.data["stock_quantity"] as String,
+//                        availabilityStatus = "",
+//                        weight = it.data["weight"] as String,
+//                        rating = it.data["average_rating"] as Double,
+//                        createdAt = it.data["created_at"] as String,
+//                        images = it.data["images"] as List<String>,
+//                        tags = it.data["tags"] as List<String>,
+//                    )
+//                }
 
-                            enrichedProduct
-                        }
-                    }.awaitAll()
-                }
 
-                val enrichedProduct = product.copy(
-                    products = enrichedProducts
-                )
-
-
-                val appwriteProduct = appwriteDatabase.listDocuments(
-                    databaseId,
-                    collectionProducts
-                )
-
-                val appwriteProductList = appwriteProduct.documents
-
-                for(appwriteProductTest in appwriteProductList){
-                    Log.d("TEST","Product test: ${appwriteProductTest.data}")
-                    val encode = Json.encodeToString(appwriteProductTest.data)
-                    Log.d("TEST","Product test: $encode")
-                }
-
-                val appwriteProducts = appwriteProductList.map {
-                    Log.d("Product", it.data.toString())
-                    val dataToString = Json.encodeToString(it.data)
-                    Log.d("Product", "Data to string: $dataToString")
-                    Json.decodeFromString<Product>(dataToString)
-                }
-
-                Log.d("Product", "appwrite products: $appwriteProducts")
-
-                emit(State.Succes(enrichedProduct))
+                emit(State.Succes(product))
             } catch (e: Exception) {
                 Log.d(TAG, "Error fetch all products: ${e.message}")
 
@@ -135,13 +138,20 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
         emit(State.Loading)
         try {
             val product = api.fetchProductById(id)
-            try {
+            val appwriteProduct = try {
                 storeProductToAppwriteDatabase(product)
             } catch (e: Exception) {
                 Log.d(TAG, "Error storing product to Appwrite Database: ${e.message}")
+                throw Exception("Error storing product to Appwrite Database: ${e.message}")
             }
 
-            emit(State.Succes(product))
+            val enrichedProduct = product.copy(
+                appwriteId = appwriteProduct["id"] as String
+            )
+
+            Log.d(TAG, "Enriched product by id: $enrichedProduct")
+
+            emit(State.Succes(enrichedProduct))
         } catch (e: Exception) {
             emit(State.Failure(e))
         }
@@ -158,7 +168,7 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
         }
     }
 
-    private suspend fun storeProductToAppwriteDatabase(product: Product.Product) =
+    private suspend fun storeProductToAppwriteDatabase(product: Product.Product): Map<String, Any> =
         withContext(Dispatchers.IO) {
             val createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
@@ -168,12 +178,12 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                 "id" to id,
                 "name" to product.title,
                 "description" to product.description,
-                "price" to product.price.toString(),
+                "price" to product.price,
                 "thumbnail" to product.thumbnail,
                 "sku" to product.sku,
-                "stock_quantity" to product.stock.toString(),
+                "stock_quantity" to product.stock,
                 "is_available" to true,
-                "weight" to product.weight.toString(),
+                "weight" to product.weight,
                 "average_rating" to product.rating,
                 "created_at" to createdAt,
                 "images" to product.images,
@@ -192,7 +202,7 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                 val isProductExist = products.documents.isNotEmpty()
 
                 if (isProductExist) {
-                    throw Exception("Product already exists in Appwrite Database.")
+                    return@withContext products.documents.first().data
                 }
 
                 appwriteDatabase.createDocument(
@@ -201,6 +211,9 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                     documentId = id,
                     data = data,
                 )
+
+                throw Exception("Product not found")
+
             } catch (e: Exception) {
                 Log.d(TAG, "Error storing product: ${e.message}")
                 throw e
