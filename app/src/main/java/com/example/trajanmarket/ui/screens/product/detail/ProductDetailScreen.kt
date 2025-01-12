@@ -85,7 +85,7 @@ fun ProductDetailScreen(
 ) {
     val productByIdState by productViewModel.productByIdState.collectAsState()
     val price by productViewModel.price.collectAsState()
-    val hasProductInCart by productViewModel.hasProductInCart.collectAsState()
+    val hasProductInCartState by productViewModel.hasProductInCart.collectAsState()
     val addToCartState by cartViewModel.addToCartState.collectAsState()
     val cartListState by cartViewModel.cartListState.collectAsState()
     val removeFromCartState by cartViewModel.removeFromCartState.collectAsState()
@@ -213,12 +213,17 @@ fun ProductDetailScreen(
                         cartListState !is State.Loading && productByIdState !is State.Loading,
                 onClick = {
                     coroutineScope.launch {
-                        if (!hasProductInCart) {
-                            cartViewModel.addToCart(
-                                product = (productByIdState as State.Succes).data
-                            )
-                        } else {
-                            cartViewModel.removeFromCart(id)
+
+                        if (hasProductInCartState is State.Succes) {
+                            val hasProductInCart =
+                                (hasProductInCartState as State.Succes<Boolean>).data
+                            if (!hasProductInCart) {
+                                cartViewModel.addToCart(
+                                    product = (productByIdState as State.Succes).data
+                                )
+                            } else {
+                                cartViewModel.removeFromCart(id)
+                            }
                         }
                     }
                 }
@@ -235,15 +240,14 @@ fun ProductDetailScreen(
                         )
                     }
                 } else {
-                    Text(
-                        if (hasProductInCart) "Remove" else "+ Keranjang",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            color = Color.White,
+                    if (hasProductInCartState is State.Succes)
+                        Text(
+                            if ((hasProductInCartState as State.Succes).data) "Remove" else "+ Keranjang",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                color = Color.White,
+                            )
                         )
-                    )
                 }
-
-
             }
         }
     ) { paddingValues ->

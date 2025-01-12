@@ -12,6 +12,7 @@ import com.example.trajanmarket.domain.usecases.GetProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -32,8 +33,8 @@ class ProductViewModel @Inject constructor(
     private val _productByIdState = MutableStateFlow<State<Product.Product>>(State.Idle)
     val productByIdState: StateFlow<State<Product.Product>> = _productByIdState
 
-    private val _hasProductInCart = MutableStateFlow(false)
-    val hasProductInCart: StateFlow<Boolean> = _hasProductInCart
+    private val _hasProductInCart = MutableStateFlow<State<Boolean>>(State.Idle)
+    val hasProductInCart = _hasProductInCart.asStateFlow()
 
     @SuppressLint("DefaultLocale")
     private fun getOriginalPrice(discountPercentage: Double, discountPrice: Double) {
@@ -55,6 +56,13 @@ class ProductViewModel @Inject constructor(
                     discountPercentage = product.discountPercentage,
                     discountPrice = product.price.toDouble()
                 )
+
+                product.appwriteId?.let {
+                    cartUseCase.checkProductInCart(product.appwriteId)
+                        .collectLatest { stateCheckProductInCart ->
+                            _hasProductInCart.emit(stateCheckProductInCart)
+                        }
+                }
             }
         }
     }

@@ -21,4 +21,7 @@ class CartUseCase @Inject constructor(
 
     fun removeFromCart(productId: String): Flow<State<Boolean>> =
         cartRepository.removeFromCart(productId)
+
+    fun checkProductInCart(productId: String): Flow<State<Boolean>> =
+        cartRepository.checkProductInCart(productId)
 }

@@ -148,8 +148,6 @@ class ProductRepository(private val api: ProductApi, private val appwriteDatabas
                 appwriteId = appwriteProduct["id"] as String
             )
 
-            Log.d(TAG, "Enriched product by id: $enrichedProduct")
-
             emit(State.Succes(enrichedProduct))
         } catch (e: Exception) {
             emit(State.Failure(e))

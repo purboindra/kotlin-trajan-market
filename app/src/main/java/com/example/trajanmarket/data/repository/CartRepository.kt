@@ -168,4 +168,32 @@ class CartRepository(
             emit(State.Failure(e))
         }
     }
+
+    fun checkProductInCart(productId: String): Flow<State<Boolean>> = flow {
+
+        emit(State.Loading)
+
+        try {
+
+            val product = appwriteDatabase.listDocuments(
+                databaseId,
+                collectionCarts,
+                queries = listOf(
+                    Query.equal("id", productId)
+                )
+            )
+
+            val hasInCart = product.documents.isNotEmpty()
+
+            if (hasInCart) {
+                emit(State.Succes(true))
+            } else {
+                emit(State.Succes(false))
+            }
+
+        } catch (e: Exception) {
+            Log.d(TAG, "Error check product in cart: ${e.message}")
+            emit(State.Failure(e))
+        }
+    }
 }
