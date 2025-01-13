@@ -1,31 +1,21 @@
 package com.example.trajanmarket.data.repository
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.trajanmarket.data.local.CartDao
 import com.example.trajanmarket.data.local.datastore.UserPreferences
 import com.example.trajanmarket.data.model.CartEntity
 import com.example.trajanmarket.data.model.Product
 import com.example.trajanmarket.data.model.State
-import com.example.trajanmarket.data.remote.api.AddToCartParams
-import com.example.trajanmarket.data.remote.api.CartApi
 import com.example.trajanmarket.data.remote.api.ProductApi
 import com.example.trajanmarket.domain.appwrite.AppwriteClient
 import io.appwrite.ID
 import io.appwrite.Query
 import io.appwrite.services.Databases
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.isSuccess
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -153,19 +143,38 @@ class CartRepository(
         }
     }
 
-    fun removeFromCart(productId: String): Flow<State<Boolean>> = flow {
-        emit(State.Loading)
+    fun removeFromCart(productId: String): Flow<State<Boolean>> = channelFlow {
+        send(State.Loading)
         try {
-            delay(1000)
-            val result = cartDao.removeFromCart(productId.toInt())
-            if (result > 0) {
-                emit(State.Succes(true))
+
+            val products = appwriteDatabase.listDocuments(
+                databaseId,
+                collectionCarts,
+                queries = listOf(
+                    Query.equal("products", productId)
+                )
+            )
+
+            if (products.documents.isNotEmpty()) {
+                appwriteDatabase.deleteDocument(
+                    databaseId,
+                    collectionCarts,
+                    products
+                        .documents.first().id
+                )
+
+                checkProductInCart(productId).collectLatest { state ->
+                    send(State.Succes(true))
+                }
             } else {
-                emit(State.Failure(Throwable(message = "Failed delete product from cart")))
+                send(State.Failure(Throwable(message = "Failed delete product from cart")))
             }
+
         } catch (e: Throwable) {
             Log.d("error removeFromCart", e.message ?: "Unknown error")
-            emit(State.Failure(e))
+            send(State.Failure(e))
+        } finally {
+            close()
         }
     }
 
@@ -174,7 +183,6 @@ class CartRepository(
         emit(State.Loading)
 
         try {
-
             val product = appwriteDatabase.listDocuments(
                 databaseId,
                 collectionCarts,
