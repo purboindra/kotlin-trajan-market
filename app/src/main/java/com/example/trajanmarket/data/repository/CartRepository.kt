@@ -179,7 +179,7 @@ class CartRepository(
                 databaseId,
                 collectionCarts,
                 queries = listOf(
-                    Query.equal("id", productId)
+                    Query.equal("products", productId)
                 )
             )
 
