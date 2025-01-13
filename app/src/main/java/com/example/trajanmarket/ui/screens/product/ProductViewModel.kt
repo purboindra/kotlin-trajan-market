@@ -36,6 +36,15 @@ class ProductViewModel @Inject constructor(
     private val _hasProductInCart = MutableStateFlow<State<Boolean>>(State.Idle)
     val hasProductInCart = _hasProductInCart.asStateFlow()
 
+    fun toggleHasProductInCart() = viewModelScope.launch {
+        _hasProductInCart.update { currentState ->
+            when (currentState) {
+                is State.Succes -> State.Succes(!currentState.data)
+                else -> currentState
+            }
+        }
+    }
+
     @SuppressLint("DefaultLocale")
     private fun getOriginalPrice(discountPercentage: Double, discountPrice: Double) {
         if (discountPercentage >= 100.0 || discountPercentage < 0) {

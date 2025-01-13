@@ -111,8 +111,7 @@ fun ProductDetailScreen(
             }
 
             is State.Succes -> {
-                /// TODO
-//                productViewModel.checkProductInCart(id)
+                productViewModel.toggleHasProductInCart()
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success add to cart!")
             }
@@ -131,8 +130,7 @@ fun ProductDetailScreen(
 
             is State.Succes -> {
                 cartViewModel.getCarts()
-                /// TODO
-//                productViewModel.checkProductInCart(id)
+                productViewModel.toggleHasProductInCart()
                 snackbarColor = green
                 snackbarHostState.showSnackbar("Success remove from cart!")
             }
@@ -222,7 +220,14 @@ fun ProductDetailScreen(
                                     product = (productByIdState as State.Succes).data
                                 )
                             } else {
-                                cartViewModel.removeFromCart(id)
+
+                                val appwriteId = (productByIdState as State.Succes).data.appwriteId
+
+                                appwriteId?.let {
+                                    cartViewModel.removeFromCart(
+                                        it
+                                    )
+                                }
                             }
                         }
                     }
